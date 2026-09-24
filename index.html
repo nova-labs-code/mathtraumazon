@@ -5,638 +5,560 @@
 
 <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    content="width=device-width,
+             initial-scale=1.0,
+             maximum-scale=1.0,
+             user-scalable=no"
 >
+
+<meta name="robots" content="noindex, nofollow">
 
 <title>ADD.</title>
 
 <style>
 * {
     box-sizing: border-box;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 html,
 body {
     margin: 0;
+    padding: 0;
     width: 100%;
     min-height: 100%;
-    background: #080808;
-    color: white;
-    font-family: Arial, Helvetica, sans-serif;
     overflow-x: hidden;
+    touch-action: manipulation;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #090914;
+    color: white;
 }
 
 body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     transition:
-        background 0.15s,
-        transform 0.1s,
-        filter 0.1s;
+        background 0.4s ease,
+        filter 0.25s ease,
+        transform 0.15s ease;
 }
 
 button {
-    font-family: inherit;
-    -webkit-tap-highlight-color: transparent;
+    font: inherit;
+    border: 0;
+    outline: none;
+    cursor: pointer;
+    touch-action: manipulation;
 }
 
 #app {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px 15px 50px;
+    width: min(94vw, 700px);
+    margin: auto;
+    padding: 20px;
 }
 
-#top {
-    width: min(900px, 100%);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
-
-#title {
-    font-size: clamp(30px, 8vw, 55px);
-    font-weight: 1000;
-    letter-spacing: -5px;
-}
-
-#level {
-    border: 2px solid white;
-    padding: 8px 12px;
-    font-weight: 900;
-    font-size: 17px;
-}
-
-#progressContainer {
-    width: min(900px, 100%);
-    height: 12px;
-    border: 2px solid white;
-    margin-bottom: 25px;
-    overflow: hidden;
-}
-
-#progress {
-    width: 0%;
-    height: 100%;
-    background: white;
-    transition: width 0.2s;
-}
-
-#card {
-    width: min(900px, 100%);
-    border: 3px solid white;
-    padding: 30px 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    transition:
-        transform 0.15s,
-        border-color 0.15s;
-}
-
-#question {
-    font-size: clamp(34px, 9vw, 95px);
-    font-weight: 1000;
-    text-align: center;
-    line-height: 1.05;
-    word-break: break-word;
-    margin: 15px 0 30px;
-}
-
-#answerDisplay {
-    width: min(600px, 100%);
-    height: 75px;
-
-    border: 3px solid white;
-    background: #111;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    font-size: clamp(30px, 8vw, 48px);
-    font-weight: 1000;
-
-    overflow: hidden;
-    white-space: nowrap;
-
-    margin-bottom: 18px;
-}
-
-#answerDisplay.empty::before {
-    content: "ANSWER";
-    opacity: 0.25;
-}
-
-#answerDisplay.shake {
-    animation: answerShake 0.35s;
-}
-
-@keyframes answerShake {
-    0% {
-        transform: translateX(0);
-    }
-
-    20% {
-        transform: translateX(-10px);
-    }
-
-    40% {
-        transform: translateX(10px);
-    }
-
-    60% {
-        transform: translateX(-8px);
-    }
-
-    80% {
-        transform: translateX(8px);
-    }
-
-    100% {
-        transform: translateX(0);
-    }
-}
-
-
-/* ==========================
-   NUMPAD
-========================== */
-
-#keypad {
-    width: min(600px, 100%);
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, 1fr);
-
-    gap: 8px;
-}
-
-.key {
-    min-height: 65px;
-
-    border: 2px solid white;
-
-    background: #151515;
-    color: white;
-
-    font-size: 27px;
-    font-weight: 900;
-
-    cursor: pointer;
-
-    touch-action: manipulation;
-
-    padding: 0;
-
-    -webkit-user-select: none;
-    user-select: none;
-
-    transition:
-        transform 0.05s,
-        background 0.05s,
-        color 0.05s;
-}
-
-.key:active {
-    transform: scale(0.94);
-    background: white;
-    color: black;
-}
-
-.key.delete {
-    grid-column: 1;
-}
-
-.key.zero {
-    grid-column: 2;
-}
-
-.key.enter {
-    grid-column: 3;
-    background: white;
-    color: black;
-}
-
-.key.enter:active {
-    background: #aaa;
-}
-
-
-/* ==========================
-   STATS
-========================== */
-
-#stats {
-    width: min(900px, 100%);
-
-    display: flex;
-    justify-content: center;
-    gap: 25px;
-    flex-wrap: wrap;
-
-    margin-top: 20px;
-
-    font-weight: 900;
-}
-
-
-/* ==========================
-   START / FINISH
-========================== */
-
-#startScreen,
-#finishedScreen {
-    position: fixed;
-    inset: 0;
-
-    z-index: 200;
-
-    background: #080808;
-    color: white;
-
-    display: flex;
-    flex-direction: column;
-
-    justify-content: center;
-    align-items: center;
-
-    padding: 25px;
-
+.screen {
     text-align: center;
 }
 
-#finishedScreen {
-    display: none;
+.hidden {
+    display: none !important;
 }
 
-.big {
-    font-size: clamp(60px, 18vw, 160px);
-    font-weight: 1000;
-    letter-spacing: -10px;
+/* =========================
+   START SCREEN
+========================= */
+
+#startScreen {
+    padding: 35px 20px;
+}
+
+.logo {
+    font-size: clamp(4rem, 18vw, 8rem);
+    font-weight: 900;
+    letter-spacing: -0.08em;
+    line-height: 0.9;
+    margin-bottom: 15px;
 }
 
 .subtitle {
-    max-width: 700px;
-
-    line-height: 1.5;
-
-    font-size: 19px;
-
-    margin: 20px 0 30px;
+    color: #9da0c9;
+    font-size: 1rem;
+    margin-bottom: 35px;
 }
 
 .startButton {
-    border: 0;
-
-    background: white;
-    color: black;
-
-    padding: 18px 40px;
-
-    font-size: 22px;
-    font-weight: 1000;
-
-    cursor: pointer;
-
-    touch-action: manipulation;
+    width: 100%;
+    max-width: 360px;
+    padding: 20px;
+    border-radius: 18px;
+    background: #635bff;
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 800;
+    box-shadow: 0 12px 35px rgba(99, 91, 255, 0.3);
+    transition: transform 0.15s ease, filter 0.15s ease;
 }
 
+.startButton:active {
+    transform: scale(0.96);
+}
 
-/* ==========================
-   MESSAGE
-========================== */
+.startButton:hover {
+    filter: brightness(1.1);
+}
 
-#message {
-    position: fixed;
+/* =========================
+   GAME
+========================= */
 
-    left: 50%;
-    top: 50%;
+#gameScreen {
+    width: 100%;
+}
 
-    z-index: 100;
+.topBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
 
-    transform:
-        translate(-50%, -50%)
-        scale(0);
+.levelLabel {
+    font-size: 0.95rem;
+    color: #aaaed5;
+    font-weight: 700;
+}
 
-    font-size:
-        clamp(35px, 12vw, 120px);
+.progressText {
+    font-size: 0.95rem;
+    color: #aaaed5;
+}
 
-    font-weight: 1000;
+.progressBar {
+    width: 100%;
+    height: 8px;
+    border-radius: 100px;
+    background: #1b1b2b;
+    overflow: hidden;
+    margin-bottom: 25px;
+}
 
+.progressFill {
+    width: 0%;
+    height: 100%;
+    background: #635bff;
+    transition: width 0.2s ease;
+}
+
+.questionCard {
+    background: #111122;
+    border: 1px solid #252542;
+    border-radius: 25px;
+    padding: 30px 20px;
     text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
 
-    white-space: pre-line;
+.question {
+    font-size: clamp(2.5rem, 13vw, 5rem);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    margin-bottom: 18px;
+}
 
-    pointer-events: none;
+.answer {
+    min-height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 15px;
+    background: #080810;
+    border: 2px solid #292946;
+    font-size: 2.4rem;
+    font-weight: 800;
+    overflow: hidden;
+    word-break: break-all;
+}
 
-    text-shadow:
-        5px 5px 0 #000;
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin: 18px 0;
+    font-weight: 700;
+}
 
+.correctStat {
+    color: #65e6a5;
+}
+
+.wrongStat {
+    color: #ff6578;
+}
+
+/* =========================
+   NUMPAD
+========================= */
+
+.numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.numButton {
+    min-height: 68px;
+    border-radius: 17px;
+    background: #18182a;
+    color: white;
+    border: 1px solid #292946;
+    font-size: 1.45rem;
+    font-weight: 800;
     transition:
-        transform 0.12s;
+        transform 0.08s ease,
+        background 0.08s ease;
 }
 
-#message.show {
-    transform:
-        translate(-50%, -50%)
-        scale(1);
+.numButton:active {
+    transform: scale(0.91);
+    background: #292946;
 }
 
+.deleteButton {
+    background: #241820;
+    color: #ff7d8d;
+}
 
-/* ==========================
-   CURSED LEVELS
-========================== */
+.enterButton {
+    background: #635bff;
+    color: white;
+}
+
+.zeroButton {
+    grid-column: 2;
+}
+
+/* =========================
+   FINISH SCREEN
+========================= */
+
+#finishScreen {
+    padding: 30px 15px;
+}
+
+.finishTitle {
+    font-size: clamp(3rem, 13vw, 6rem);
+    font-weight: 900;
+    margin-bottom: 20px;
+}
+
+.finalStats {
+    background: #111122;
+    border: 1px solid #252542;
+    border-radius: 22px;
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.finalNumber {
+    font-size: 3rem;
+    font-weight: 900;
+    margin: 8px;
+}
+
+.finishButton {
+    width: 100%;
+    padding: 18px;
+    border-radius: 16px;
+    background: #635bff;
+    color: white;
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+
+/* =========================
+   FEEDBACK
+========================= */
+
+#feedback {
+    min-height: 28px;
+    margin-top: 12px;
+    font-weight: 800;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+#feedback.show {
+    opacity: 1;
+}
+
+.feedbackCorrect {
+    color: #65e6a5;
+}
+
+.feedbackWrong {
+    color: #ff6578;
+}
+
+/* =========================
+   LEVEL EFFECTS
+========================= */
 
 body.level2 {
-    background: #0b0012;
+    background: #0b0b1c;
 }
 
 body.level3 {
-    background: #00110b;
+    background: #100b1c;
 }
 
 body.level4 {
-    background: #110000;
+    background: #170a1c;
 }
 
 body.level5 {
-    background: #100f00;
+    background: #1c090f;
 }
 
 body.level6 {
-    background: #001016;
+    background: #190a0a;
 }
 
 body.level7 {
-    background: #16000f;
+    background: #100c1c;
 }
 
 body.level8 {
-    background: #111;
+    background: #0c151c;
 }
 
 body.level9 {
-    background:
-        repeating-linear-gradient(
-            45deg,
-            #000 0,
-            #000 10px,
-            #181818 10px,
-            #181818 20px
-        );
+    background: #180d19;
 }
 
 body.level10 {
-    background: #000;
+    background: #050505;
 }
 
-body.level4 #card {
+body.level3 .questionCard {
+    transform: rotate(-0.4deg);
+}
+
+body.level4 .questionCard {
+    animation: cardWobble 2s infinite ease-in-out;
+}
+
+body.level5 .numButton:nth-child(odd) {
+    transform: rotate(1deg);
+}
+
+body.level6 .question {
+    animation: textWobble 0.8s infinite;
+}
+
+body.level7 .questionCard {
+    border-radius: 5px 30px 8px 25px;
+}
+
+body.level8 .numButton {
+    border-radius: 3px 20px 5px 15px;
+}
+
+body.level9 .question {
+    letter-spacing: 0.04em;
+}
+
+body.level10 {
+    animation: backgroundChaos 2.5s infinite;
+}
+
+body.level10 .questionCard {
     animation:
-        breathe 1.2s infinite alternate;
+        cardWobble 0.6s infinite ease-in-out,
+        hueSpin 3s infinite linear;
 }
 
-@keyframes breathe {
+body.level10 .numButton {
+    animation: buttonChaos 0.7s infinite alternate;
+}
+
+@keyframes cardWobble {
+    0% {
+        transform: rotate(-0.7deg);
+    }
+
+    50% {
+        transform: rotate(0.7deg) scale(1.005);
+    }
+
+    100% {
+        transform: rotate(-0.7deg);
+    }
+}
+
+@keyframes textWobble {
+    0% {
+        transform: translateX(-1px);
+    }
+
+    50% {
+        transform: translateX(1px) rotate(0.5deg);
+    }
+
+    100% {
+        transform: translateX(-1px);
+    }
+}
+
+@keyframes backgroundChaos {
+    0% {
+        filter: hue-rotate(0deg);
+    }
+
+    50% {
+        filter: hue-rotate(80deg);
+    }
+
+    100% {
+        filter: hue-rotate(0deg);
+    }
+}
+
+@keyframes hueSpin {
     from {
-        transform: scale(1);
+        filter: hue-rotate(0deg);
     }
 
     to {
-        transform: scale(1.015);
+        filter: hue-rotate(360deg);
     }
 }
 
-body.level5 #question {
-    animation:
-        wobble 0.8s infinite;
-}
-
-@keyframes wobble {
-    0% {
-        transform: rotate(0);
-    }
-
-    25% {
-        transform: rotate(1deg);
-    }
-
-    50% {
-        transform: rotate(-1deg);
-    }
-
-    75% {
-        transform: rotate(0.5deg);
-    }
-
-    100% {
-        transform: rotate(0);
-    }
-}
-
-body.level6 #answerDisplay {
-    animation:
-        pulseInput 0.7s infinite alternate;
-}
-
-@keyframes pulseInput {
+@keyframes buttonChaos {
     from {
-        transform: scale(1);
+        transform: rotate(-2deg) scale(0.98);
     }
 
     to {
-        transform: scale(1.03);
+        transform: rotate(2deg) scale(1.02);
     }
 }
 
-body.level7 #title {
-    animation:
-        glitch 0.25s infinite;
+/* =========================
+   HIT EFFECTS
+========================= */
+
+.correctFlash {
+    animation: correctFlash 0.25s ease;
 }
 
-@keyframes glitch {
+@keyframes correctFlash {
     0% {
-        transform: translate(0);
-    }
-
-    20% {
-        transform: translate(-2px, 1px);
-    }
-
-    40% {
-        transform: translate(2px, -1px);
-    }
-
-    60% {
-        transform: translate(-1px, -2px);
-    }
-
-    80% {
-        transform: translate(1px, 2px);
-    }
-
-    100% {
-        transform: translate(0);
-    }
-}
-
-body.level8 #question {
-    font-family:
-        "Comic Sans MS",
-        cursive;
-}
-
-body.level9 #card {
-    animation:
-        cursedCard 0.35s infinite;
-}
-
-@keyframes cursedCard {
-    0% {
-        transform:
-            translate(0)
-            rotate(0);
-    }
-
-    25% {
-        transform:
-            translate(2px, -1px)
-            rotate(0.3deg);
+        transform: scale(1);
     }
 
     50% {
-        transform:
-            translate(-2px, 1px)
-            rotate(-0.3deg);
-    }
-
-    75% {
-        transform:
-            translate(1px, 2px)
-            rotate(0.2deg);
+        transform: scale(1.025);
     }
 
     100% {
-        transform:
-            translate(0)
-            rotate(0);
+        transform: scale(1);
     }
 }
 
-body.level10 #card {
-    border-width: 5px;
-
-    animation:
-        level10Card 0.18s infinite;
+.wrongShake {
+    animation: wrongShake 0.35s ease;
 }
 
-body.level10 #question {
-    animation:
-        level10Text 0.3s infinite;
-}
-
-@keyframes level10Card {
-    0% {
-        transform:
-            translate(0)
-            rotate(0)
-            scale(1);
-    }
-
-    25% {
-        transform:
-            translate(3px, -2px)
-            rotate(0.5deg)
-            scale(1.01);
-    }
-
-    50% {
-        transform:
-            translate(-3px, 2px)
-            rotate(-0.5deg)
-            scale(0.99);
-    }
-
-    75% {
-        transform:
-            translate(2px, 1px)
-            rotate(0.3deg)
-            scale(1.01);
-    }
-
+@keyframes wrongShake {
+    0%,
     100% {
-        transform:
-            translate(0)
-            rotate(0)
-            scale(1);
-    }
-}
-
-@keyframes level10Text {
-    0% {
-        transform: translate(0);
+        transform: translateX(0);
     }
 
     20% {
-        transform: translate(-3px, 2px);
+        transform: translateX(-7px);
     }
 
     40% {
-        transform: translate(3px, -2px);
+        transform: translateX(7px);
     }
 
     60% {
-        transform: translate(2px, 3px);
+        transform: translateX(-5px);
     }
 
     80% {
-        transform: translate(-2px, -3px);
-    }
-
-    100% {
-        transform: translate(0);
+        transform: translateX(5px);
     }
 }
 
+.screenShake {
+    animation: screenShake 0.35s ease;
+}
 
-/* ==========================
+@keyframes screenShake {
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    20% {
+        transform: translate(-6px, 3px);
+    }
+
+    40% {
+        transform: translate(6px, -3px);
+    }
+
+    60% {
+        transform: translate(-4px, -2px);
+    }
+
+    80% {
+        transform: translate(4px, 2px);
+    }
+}
+
+.screenFlash {
+    animation: screenFlash 0.2s ease;
+}
+
+@keyframes screenFlash {
+    0% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(2);
+    }
+
+    100% {
+        filter: brightness(1);
+    }
+}
+
+/* =========================
    MOBILE
-========================== */
+========================= */
 
-@media (max-width: 600px) {
-
+@media (max-width: 500px) {
     #app {
-        padding-top: 12px;
+        width: 100%;
+        padding: 12px;
     }
 
-    #card {
-        padding:
-            20px 10px 25px;
+    .questionCard {
+        padding: 22px 14px;
     }
 
-    #question {
-        margin-top: 10px;
-        margin-bottom: 22px;
-    }
-
-    #answerDisplay {
-        height: 65px;
-        margin-bottom: 12px;
-    }
-
-    .key {
-        min-height: 58px;
-        font-size: 25px;
-    }
-
-    #stats {
-        gap: 12px;
-        font-size: 15px;
+    .numButton {
+        min-height: 62px;
     }
 }
 </style>
@@ -644,278 +566,271 @@ body.level10 #question {
 
 <body>
 
-
-<!-- START -->
-
-<div id="startScreen">
-
-    <div class="big">
-        ADD.
-    </div>
-
-    <div class="subtitle">
-        10 levels.<br>
-        100 questions per level.<br>
-        1,000 additions total.
-    </div>
-
-    <button
-        type="button"
-        class="startButton"
-        id="startButton"
-    >
-        BEGIN
-    </button>
-
-</div>
-
-
-<!-- FINISH -->
-
-<div id="finishedScreen">
-
-    <div class="big">
-        DONE.
-    </div>
-
-    <div
-        class="subtitle"
-        id="finalText"
-    ></div>
-
-    <button
-        type="button"
-        class="startButton"
-        id="againButton"
-    >
-        DO IT AGAIN
-    </button>
-
-</div>
-
-
-<!-- GAME -->
-
 <div id="app">
 
-    <div id="top">
+    <!-- START -->
+    <section id="startScreen" class="screen">
 
-        <div id="title">
-            ADD.
+        <div class="logo">ADD.</div>
+
+        <div class="subtitle">
+            1,000 questions. 10 levels.
         </div>
 
-        <div id="level">
-            LEVEL 1
+        <button
+            id="startButton"
+            class="startButton"
+            type="button"
+        >
+            BEGIN
+        </button>
+
+    </section>
+
+
+    <!-- GAME -->
+    <section id="gameScreen" class="screen hidden">
+
+        <div class="topBar">
+
+            <div
+                id="levelLabel"
+                class="levelLabel"
+            >
+                LEVEL 1
+            </div>
+
+            <div
+                id="progressText"
+                class="progressText"
+            >
+                1 / 100
+            </div>
+
         </div>
 
-    </div>
-
-
-    <div id="progressContainer">
-
-        <div id="progress"></div>
-
-    </div>
-
-
-    <div id="card">
-
-        <div id="question">
-            ---
+        <div class="progressBar">
+            <div
+                id="progressFill"
+                class="progressFill"
+            ></div>
         </div>
-
 
         <div
-            id="answerDisplay"
-            class="empty"
-        ></div>
+            id="questionCard"
+            class="questionCard"
+        >
 
+            <div
+                id="question"
+                class="question"
+            >
+                0 + 0
+            </div>
 
-        <div id="keypad">
+            <div
+                id="answer"
+                class="answer"
+            >
+                _
+            </div>
 
-            <button
-                type="button"
-                class="key number"
-                data-number="1"
-            >1</button>
+            <div class="stats">
 
-            <button
-                type="button"
-                class="key number"
-                data-number="2"
-            >2</button>
+                <div>
+                    Correct:
+                    <span
+                        id="correctCount"
+                        class="correctStat"
+                    >
+                        0
+                    </span>
+                </div>
 
-            <button
-                type="button"
-                class="key number"
-                data-number="3"
-            >3</button>
+                <div>
+                    Wrong:
+                    <span
+                        id="wrongCount"
+                        class="wrongStat"
+                    >
+                        0
+                    </span>
+                </div>
 
-            <button
-                type="button"
-                class="key number"
-                data-number="4"
-            >4</button>
+            </div>
 
-            <button
-                type="button"
-                class="key number"
-                data-number="5"
-            >5</button>
-
-            <button
-                type="button"
-                class="key number"
-                data-number="6"
-            >6</button>
-
-            <button
-                type="button"
-                class="key number"
-                data-number="7"
-            >7</button>
-
-            <button
-                type="button"
-                class="key number"
-                data-number="8"
-            >8</button>
-
-            <button
-                type="button"
-                class="key number"
-                data-number="9"
-            >9</button>
-
-            <button
-                type="button"
-                class="key delete"
-                id="deleteButton"
-            >←</button>
-
-            <button
-                type="button"
-                class="key number zero"
-                data-number="0"
-            >0</button>
-
-            <button
-                type="button"
-                class="key enter"
-                id="enterButton"
-            >✓</button>
+            <div
+                id="feedback"
+            ></div>
 
         </div>
 
-    </div>
+
+        <div class="numpad">
+
+            <button class="numButton" data-number="1">1</button>
+            <button class="numButton" data-number="2">2</button>
+            <button class="numButton" data-number="3">3</button>
+
+            <button class="numButton" data-number="4">4</button>
+            <button class="numButton" data-number="5">5</button>
+            <button class="numButton" data-number="6">6</button>
+
+            <button class="numButton" data-number="7">7</button>
+            <button class="numButton" data-number="8">8</button>
+            <button class="numButton" data-number="9">9</button>
+
+            <button
+                id="deleteButton"
+                class="numButton deleteButton"
+            >
+                DELETE
+            </button>
+
+            <button
+                class="numButton zeroButton"
+                data-number="0"
+            >
+                0
+            </button>
+
+            <button
+                id="enterButton"
+                class="numButton enterButton"
+            >
+                ENTER
+            </button>
+
+        </div>
+
+    </section>
 
 
-    <div id="stats">
+    <!-- FINISH -->
+    <section id="finishScreen" class="screen hidden">
 
-        <span id="questionCount">
-            0 / 100
-        </span>
+        <div class="finishTitle">
+            DONE.
+        </div>
 
-        <span id="correct">
-            Correct: 0
-        </span>
+        <div class="finalStats">
 
-        <span id="wrong">
-            Wrong: 0
-        </span>
+            <div>
+                Correct
+            </div>
 
-    </div>
+            <div
+                id="finalCorrect"
+                class="finalNumber correctStat"
+            >
+                0
+            </div>
+
+            <div>
+                Wrong
+            </div>
+
+            <div
+                id="finalWrong"
+                class="finalNumber wrongStat"
+            >
+                0
+            </div>
+
+        </div>
+
+        <button
+            id="restartButton"
+            class="finishButton"
+            type="button"
+        >
+            START OVER
+        </button>
+
+    </section>
 
 </div>
-
-
-<div id="message"></div>
 
 
 <script>
 "use strict";
 
-
-/* ==========================================
-   SETTINGS
-========================================== */
-
-const TOTAL_LEVELS = 10;
+/* =========================================================
+   GAME STATE
+========================================================= */
 
 const QUESTIONS_PER_LEVEL = 100;
-
-const TOTAL_QUESTIONS =
-    TOTAL_LEVELS *
-    QUESTIONS_PER_LEVEL;
-
-
-/* ==========================================
-   GAME STATE
-========================================== */
+const TOTAL_LEVELS = 10;
 
 let level = 1;
-
 let questionNumber = 0;
 
 let correct = 0;
-
 let wrong = 0;
 
-let currentA = 0;
-
-let currentB = 0;
-
 let currentAnswer = 0;
-
 let currentInput = "";
 
+let accepting = false;
 let started = false;
 
-let accepting = false;
+let chaosInterval = null;
 
 
-/* ==========================================
-   ELEMENTS
-========================================== */
-
-const questionElement =
-    document.getElementById("question");
-
-const answerDisplay =
-    document.getElementById("answerDisplay");
-
-const levelElement =
-    document.getElementById("level");
-
-const progressElement =
-    document.getElementById("progress");
-
-const questionCountElement =
-    document.getElementById("questionCount");
-
-const correctElement =
-    document.getElementById("correct");
-
-const wrongElement =
-    document.getElementById("wrong");
-
-const messageElement =
-    document.getElementById("message");
+/* =========================================================
+   DOM
+========================================================= */
 
 const startScreen =
     document.getElementById("startScreen");
 
-const finishedScreen =
-    document.getElementById("finishedScreen");
+const gameScreen =
+    document.getElementById("gameScreen");
 
-const finalText =
-    document.getElementById("finalText");
+const finishScreen =
+    document.getElementById("finishScreen");
 
 const startButton =
     document.getElementById("startButton");
 
-const againButton =
-    document.getElementById("againButton");
+const restartButton =
+    document.getElementById("restartButton");
+
+const levelLabel =
+    document.getElementById("levelLabel");
+
+const progressText =
+    document.getElementById("progressText");
+
+const progressFill =
+    document.getElementById("progressFill");
+
+const question =
+    document.getElementById("question");
+
+const answer =
+    document.getElementById("answer");
+
+const correctCount =
+    document.getElementById("correctCount");
+
+const wrongCount =
+    document.getElementById("wrongCount");
+
+const feedback =
+    document.getElementById("feedback");
+
+const questionCard =
+    document.getElementById("questionCard");
+
+const finalCorrect =
+    document.getElementById("finalCorrect");
+
+const finalWrong =
+    document.getElementById("finalWrong");
+
+const numberButtons =
+    document.querySelectorAll("[data-number]");
 
 const deleteButton =
     document.getElementById("deleteButton");
@@ -923,312 +838,288 @@ const deleteButton =
 const enterButton =
     document.getElementById("enterButton");
 
-const numberButtons =
-    document.querySelectorAll(".number");
 
-
-/* ==========================================
+/* =========================================================
    AUDIO
-========================================== */
+   =========================================================
+
+   Both MP3 files are expected to be in the SAME folder
+   as this HTML file:
+
+       index.html
+       Wrong.mp3
+       Correct.mp3
+
+   Web Audio is used instead of <audio>, so there are no
+   audio controls placed in the page.
+========================================================= */
 
 let audioContext = null;
 
 let wrongBuffer = null;
-
 let correctBuffer = null;
 
 let currentSoundSource = null;
 
+let audioLoading = false;
+let audioLoaded = false;
 
-/* ==========================================
-   CREATE AUDIO CONTEXT
-========================================== */
 
+/* Create ONE AudioContext and reuse it. */
 function initializeAudio() {
 
-    if (!audioContext) {
-
-        const AudioContext =
-            window.AudioContext ||
-            window.webkitAudioContext;
-
-
-        if (!AudioContext) {
-
-            console.error(
-                "Web Audio API is not supported."
-            );
-
-            return false;
-        }
-
-
-        audioContext =
-            new AudioContext();
+    if (audioContext) {
+        return audioContext;
     }
 
+    const AudioContextClass =
+        window.AudioContext ||
+        window.webkitAudioContext;
 
-    /*
-        Resume immediately while we're still
-        inside the user's button interaction.
-    */
-
-    if (
-        audioContext.state ===
-        "suspended"
-    ) {
-
-        audioContext.resume()
-            .catch(error => {
-
-                console.error(
-                    "Audio resume failed:",
-                    error
-                );
-
-            });
-    }
-
-
-    return true;
-}
-
-
-/* ==========================================
-   LOAD AUDIO FILE
-========================================== */
-
-async function loadSound(file) {
-
-    if (!audioContext) {
+    if (!AudioContextClass) {
+        console.error(
+            "Web Audio API is not supported by this browser."
+        );
 
         return null;
     }
 
+    audioContext = new AudioContextClass();
+
+    return audioContext;
+}
+
+
+/*
+    Load one MP3.
+
+    new URL(file, document.baseURI)
+
+    resolves the filename relative to the HTML document.
+*/
+async function loadSound(file) {
+
+    const context = initializeAudio();
+
+    if (!context) {
+        throw new Error(
+            "Could not create AudioContext."
+        );
+    }
+
+    const soundURL =
+        new URL(file, document.baseURI);
+
+    console.log(
+        "Loading sound:",
+        soundURL.href
+    );
+
+    const response =
+        await fetch(soundURL.href, {
+            cache: "no-store"
+        });
+
+    if (!response.ok) {
+        throw new Error(
+            `${file} returned HTTP ${response.status}`
+        );
+    }
+
+    const data =
+        await response.arrayBuffer();
+
+    if (!data.byteLength) {
+        throw new Error(
+            `${file} is empty.`
+        );
+    }
+
+    const buffer =
+        await context.decodeAudioData(data);
+
+    console.log(
+        "Loaded sound:",
+        file
+    );
+
+    return buffer;
+}
+
+
+/*
+    Load BOTH sounds before the game starts.
+
+    This prevents the first few answers from happening
+    before the MP3 files have finished loading.
+*/
+async function loadAudio() {
+
+    if (audioLoaded) {
+        return true;
+    }
+
+    if (audioLoading) {
+        return false;
+    }
+
+    audioLoading = true;
 
     try {
 
-        console.log(
-            "Loading sound:",
-            file
-        );
+        initializeAudio();
 
+        wrongBuffer =
+            await loadSound("Wrong.mp3");
 
-        const response =
-            await fetch(
-                `./${file}`,
-                {
-                    cache: "no-store"
-                }
-            );
+        correctBuffer =
+            await loadSound("Correct.mp3");
 
-
-        if (!response.ok) {
-
-            throw new Error(
-                `HTTP ${response.status}`
-            );
-        }
-
-
-        const data =
-            await response.arrayBuffer();
-
-
-        const buffer =
-            await audioContext.decodeAudioData(
-                data
-            );
-
+        audioLoaded = true;
 
         console.log(
-            "Loaded sound:",
-            file
+            "ADD. audio loaded successfully."
         );
 
-
-        return buffer;
+        return true;
 
     } catch (error) {
 
         console.error(
-            `Failed to load ${file}:`,
+            "ADD. audio failed to load:",
             error
         );
 
+        audioLoaded = false;
 
-        return null;
+        return false;
+
+    } finally {
+
+        audioLoading = false;
+
     }
 }
 
 
-/* ==========================================
-   LOAD BOTH SOUNDS
-========================================== */
+/*
+    Start/resume audio.
 
-async function loadAudio() {
+    This is called from the BEGIN button so the browser
+    sees it as part of a user interaction.
+*/
+async function activateAudio() {
 
-    if (
-        !initializeAudio()
-    ) {
+    const context =
+        initializeAudio();
 
-        return;
+    if (!context) {
+        return false;
     }
 
+    try {
 
-    const results =
-        await Promise.all([
-            loadSound("Wrong.mp3"),
-            loadSound("Correct.mp3")
-        ]);
-
-
-    wrongBuffer =
-        results[0];
-
-    correctBuffer =
-        results[1];
-
-
-    console.log(
-        "Audio ready:",
-        {
-            wrong: !!wrongBuffer,
-            correct: !!correctBuffer
+        if (context.state === "suspended") {
+            await context.resume();
         }
-    );
+
+        return context.state === "running";
+
+    } catch (error) {
+
+        console.error(
+            "Could not activate audio:",
+            error
+        );
+
+        return false;
+    }
 }
 
 
-/* ==========================================
-   STOP CURRENT SOUND
-========================================== */
+/*
+    Stop the currently playing sound.
 
+    This guarantees that Wrong.mp3 and Correct.mp3
+    cannot overlap.
+*/
 function stopCurrentSound() {
 
-    if (
-        !currentSoundSource
-    ) {
-
+    if (!currentSoundSource) {
         return;
     }
 
-
     try {
-
         currentSoundSource.stop();
-
-    } catch {
-
+    } catch (error) {
+        // Already stopped.
     }
-
 
     try {
-
         currentSoundSource.disconnect();
-
-    } catch {
-
+    } catch (error) {
+        // Already disconnected.
     }
 
-
-    currentSoundSource =
-        null;
+    currentSoundSource = null;
 }
 
 
-/* ==========================================
-   PLAY BUFFER
-========================================== */
+/*
+    Play an AudioBuffer.
+*/
+async function playSound(buffer) {
 
-function playSound(buffer) {
-
-    if (
-        !buffer
-    ) {
-
+    if (!buffer) {
         console.warn(
-            "Sound buffer is not loaded."
+            "Requested sound has not loaded yet."
         );
 
         return;
     }
 
+    const context =
+        initializeAudio();
 
-    if (
-        !initializeAudio()
-    ) {
-
+    if (!context) {
         return;
     }
 
-
-    /*
-        Never allow two sounds to overlap.
-    */
-
-    stopCurrentSound();
-
-
-    const source =
-        audioContext.createBufferSource();
-
-
-    source.buffer =
-        buffer;
-
-
-    const gain =
-        audioContext.createGain();
-
-
-    gain.gain.value =
-        1;
-
-
-    source.connect(gain);
-
-    gain.connect(
-        audioContext.destination
-    );
-
-
-    currentSoundSource =
-        source;
-
-
-    source.onended = () => {
-
-        if (
-            currentSoundSource ===
-            source
-        ) {
-
-            currentSoundSource =
-                null;
-        }
-
-
-        try {
-
-            source.disconnect();
-
-        } catch {
-
-        }
-
-
-        try {
-
-            gain.disconnect();
-
-        } catch {
-
-        }
-    };
-
-
     try {
+
+        if (context.state === "suspended") {
+            await context.resume();
+        }
+
+        /*
+            Stop whatever sound is currently playing.
+        */
+        stopCurrentSound();
+
+        const source =
+            context.createBufferSource();
+
+        source.buffer = buffer;
+
+        source.connect(
+            context.destination
+        );
+
+        currentSoundSource = source;
+
+        source.onended = () => {
+
+            if (
+                currentSoundSource === source
+            ) {
+                currentSoundSource = null;
+            }
+
+            try {
+                source.disconnect();
+            } catch (error) {}
+
+        };
 
         source.start(0);
 
@@ -1238,480 +1129,229 @@ function playSound(buffer) {
             "Could not play sound:",
             error
         );
+
     }
 }
 
 
-/* ==========================================
-   WRONG SOUND
-========================================== */
-
+/*
+    Wrong.mp3
+    Plays EVERY time the user gets an answer wrong.
+*/
 function playWrongSound() {
-
-    playSound(
-        wrongBuffer
-    );
+    playSound(wrongBuffer);
 }
 
 
-/* ==========================================
-   CORRECT SOUND
-========================================== */
-
+/*
+    Correct.mp3
+    Only called on every 10th correct answer.
+*/
 function playCorrectSound() {
-
-    playSound(
-        correctBuffer
-    );
+    playSound(correctBuffer);
 }
 
 
-/* ==========================================
-   RANDOM NUMBER
-========================================== */
+/* =========================================================
+   QUESTION GENERATION
+========================================================= */
 
-function randomNumberWithDigits(
-    digits
-) {
+function randomDigit() {
+    return Math.floor(Math.random() * 10);
+}
 
-    if (
-        digits === 1
-    ) {
 
-        return Math.floor(
-            Math.random() * 10
-        );
+function randomNDigitNumber(digits) {
+
+    if (digits <= 1) {
+        return randomDigit();
     }
-
 
     const minimum =
-        10 ** (
-            digits - 1
-        );
-
+        Math.pow(10, digits - 1);
 
     const maximum =
-        (
-            10 ** digits
-        ) - 1;
-
+        Math.pow(10, digits) - 1;
 
     return Math.floor(
         Math.random() *
-        (
-            maximum -
-            minimum +
-            1
-        )
+        (maximum - minimum + 1)
     ) + minimum;
 }
 
 
-/* ==========================================
-   GENERATE QUESTION
-========================================== */
-
 function generateQuestion() {
 
-    currentA =
-        randomNumberWithDigits(
-            level
-        );
+    let a;
+    let b;
 
+    /*
+        Level 1:
+        single digit.
 
-    currentB =
-        randomNumberWithDigits(
-            level
-        );
+        Level 2:
+        two-digit.
 
+        ...
 
-    currentAnswer =
-        currentA +
-        currentB;
+        Level 10:
+        ten-digit.
+    */
 
+    const digits = level;
 
-    currentInput =
-        "";
+    a =
+        randomNDigitNumber(digits);
 
+    b =
+        randomNDigitNumber(digits);
+
+    currentAnswer = a + b;
+
+    question.textContent =
+        `${a} + ${b}`;
+
+    currentInput = "";
 
     updateAnswerDisplay();
-
-
-    const a =
-        currentA.toLocaleString();
-
-
-    const b =
-        currentB.toLocaleString();
-
-
-    if (
-        level >= 8
-    ) {
-
-        const operators = [
-            "+",
-            "＋",
-            "⊕",
-            "PLUS",
-            "+ +",
-            "ADD"
-        ];
-
-
-        const operator =
-            randomChoice(
-                operators
-            );
-
-
-        questionElement.textContent =
-            `${a} ${operator} ${b}`;
-
-    } else {
-
-        questionElement.textContent =
-            `${a} + ${b}`;
-    }
-
-
-    accepting =
-        true;
-
-
-    updateUI();
 }
 
 
-/* ==========================================
-   ANSWER DISPLAY
-========================================== */
+/* =========================================================
+   DISPLAY
+========================================================= */
 
 function updateAnswerDisplay() {
 
-    if (
-        currentInput.length === 0
-    ) {
-
-        answerDisplay.textContent =
-            "";
-
-
-        answerDisplay.classList.add(
-            "empty"
-        );
+    answer.textContent =
+        currentInput === ""
+            ? "_"
+            : currentInput;
+}
 
 
-        return;
-    }
+function updateStats() {
+
+    correctCount.textContent =
+        correct;
+
+    wrongCount.textContent =
+        wrong;
+}
 
 
-    answerDisplay.classList.remove(
-        "empty"
+function updateProgress() {
+
+    progressText.textContent =
+        `${questionNumber + 1} / ${QUESTIONS_PER_LEVEL}`;
+
+    const percentage =
+        (questionNumber /
+            QUESTIONS_PER_LEVEL) * 100;
+
+    progressFill.style.width =
+        `${percentage}%`;
+}
+
+
+function updateLevelDisplay() {
+
+    levelLabel.textContent =
+        `LEVEL ${level}`;
+
+    document.body.className =
+        `level${level}`;
+
+    updateProgress();
+}
+
+
+/* =========================================================
+   FEEDBACK
+========================================================= */
+
+function showFeedback(text, isCorrect) {
+
+    feedback.textContent =
+        text;
+
+    feedback.className =
+        isCorrect
+            ? "feedbackCorrect show"
+            : "feedbackWrong show";
+
+    clearTimeout(
+        showFeedback.timeout
     );
 
+    showFeedback.timeout =
+        setTimeout(() => {
 
-    answerDisplay.textContent =
-        Number(
-            currentInput
-        ).toLocaleString();
+            feedback.className = "";
+
+        }, 500);
 }
 
 
-/* ==========================================
-   ADD DIGIT
-========================================== */
-
-function addDigit(digit) {
-
-    if (!started)
-        return;
-
-
-    if (!accepting)
-        return;
-
-
-    if (
-        currentInput.length >= 11
-    ) {
-
-        return;
-    }
-
-
-    if (
-        currentInput === "0"
-    ) {
-
-        if (
-            digit === "0"
-        ) {
-
-            return;
-        }
-
-
-        currentInput =
-            digit;
-
-    } else {
-
-        currentInput +=
-            digit;
-    }
-
-
-    updateAnswerDisplay();
-}
-
-
-/* ==========================================
-   DELETE
-========================================== */
-
-function deleteDigit() {
-
-    if (!started)
-        return;
-
-
-    if (!accepting)
-        return;
-
-
-    currentInput =
-        currentInput.slice(
-            0,
-            -1
-        );
-
-
-    updateAnswerDisplay();
-}
-
-
-/* ==========================================
-   SUBMIT
-========================================== */
-
-function submitAnswer() {
-
-    if (!started)
-        return;
-
-
-    if (!accepting)
-        return;
-
-
-    if (
-        currentInput === ""
-    ) {
-
-        return;
-    }
-
-
-    const submitted =
-        Number(
-            currentInput
-        );
-
-
-    if (
-        !Number.isSafeInteger(
-            submitted
-        )
-    ) {
-
-        return;
-    }
-
-
-    if (
-        submitted ===
-        currentAnswer
-    ) {
-
-        handleCorrect();
-
-    } else {
-
-        handleWrong();
-    }
-}
-
-
-/* ==========================================
+/* =========================================================
    CORRECT
-========================================== */
+========================================================= */
 
 function handleCorrect() {
 
-    accepting =
-        false;
+    if (!accepting) {
+        return;
+    }
 
+    accepting = false;
 
     correct++;
 
-
     /*
-        ONLY PLAY CORRECT AUDIO EVERY
-        10TH CORRECT ANSWER.
-
-        10
-        20
-        30
-        40
-        ...
+        CORRECT AUDIO:
+        10th
+        20th
+        30th
+        40th
+        etc.
     */
-
-    if (
-        correct % 10 === 0
-    ) {
-
+    if (correct % 10 === 0) {
         playCorrectSound();
     }
 
+    showFeedback(
+        "CORRECT",
+        true
+    );
+
+    questionCard.classList.remove(
+        "correctFlash"
+    );
+
+    void questionCard.offsetWidth;
+
+    questionCard.classList.add(
+        "correctFlash"
+    );
 
     questionNumber++;
 
+    updateStats();
 
     if (
-        level <= 3
+        questionNumber >=
+        QUESTIONS_PER_LEVEL
     ) {
 
-        showMessage(
-            "✓",
+        setTimeout(
+            nextLevel,
             250
         );
 
-    } else if (
-        level === 4
-    ) {
-
-        showMessage(
-            randomChoice([
-                "CORRECT",
-                "NICE",
-                "GOOD",
-                "OKAY"
-            ]),
-            300
-        );
-
-    } else if (
-        level === 5
-    ) {
-
-        showMessage(
-            randomChoice([
-                "CORRECT",
-                "WHY",
-                "GOOD JOB?",
-                "CONTINUE"
-            ]),
-            350
-        );
-
-    } else if (
-        level === 6
-    ) {
-
-        showMessage(
-            randomChoice([
-                "CORRECT.",
-                "UNFORTUNATELY.",
-                "AGAIN.",
-                "KEEP GOING.",
-                "YOU KNOW TOO MUCH."
-            ]),
-            400
-        );
-
-
-        shakeScreen(150);
-
-    } else if (
-        level === 7
-    ) {
-
-        showMessage(
-            randomChoice([
-                "CORRECT",
-                "THE NUMBERS KNOW",
-                "GOOD",
-                "STOP",
-                "YES"
-            ]),
-            450
-        );
-
-
-        shakeScreen(200);
-
-    } else if (
-        level === 8
-    ) {
-
-        showMessage(
-            randomChoice([
-                "CORRECT???",
-                "WHY",
-                "NICE",
-                "THE ANSWER WAS REAL",
-                "CONTINUE",
-                "ERROR"
-            ]),
-            500
-        );
-
-
-        shakeScreen(250);
-
-    } else if (
-        level === 9
-    ) {
-
-        showMessage(
-            randomChoice([
-                "CORRECT",
-                "CORRECT",
-                "CORRECT",
-                "STOP ADDING",
-                "YOU CANNOT ESCAPE"
-            ]),
-            550
-        );
-
-
-        shakeScreen(350);
-
-        flashScreen();
-
-    } else {
-
-        showMessage(
-            randomChoice([
-                "CORRECT",
-                "THE FINAL LEVEL",
-                "WHY ARE YOU STILL HERE",
-                "10 DIGITS",
-                "CALCULATE"
-            ]),
-            600
-        );
-
-
-        shakeScreen(500);
-
-        flashScreen();
+        return;
     }
 
-
-    updateUI();
-
+    updateProgress();
 
     setTimeout(
         nextQuestion,
@@ -1720,819 +1360,515 @@ function handleCorrect() {
 }
 
 
-/* ==========================================
+/* =========================================================
    WRONG
-========================================== */
+========================================================= */
 
 function handleWrong() {
 
-    accepting =
-        false;
+    if (!accepting) {
+        return;
+    }
 
+    accepting = false;
 
     wrong++;
 
-
     /*
-        WRONG PLAYS EVERY TIME.
+        WRONG AUDIO:
+        EVERY wrong answer.
     */
-
     playWrongSound();
 
-
-    showMessage(
-        level >= 7
-            ? "WRONG."
-            : "✕",
-
-        level >= 7
-            ? 450
-            : 250
+    showFeedback(
+        "WRONG",
+        false
     );
 
-
-    answerDisplay.classList.remove(
-        "shake"
+    answer.classList.remove(
+        "wrongShake"
     );
 
+    void answer.offsetWidth;
 
-    void answerDisplay.offsetWidth;
-
-
-    answerDisplay.classList.add(
-        "shake"
+    answer.classList.add(
+        "wrongShake"
     );
 
+    /*
+        Starting at level 4, shake the whole screen.
+    */
+    if (level >= 4) {
 
-    if (
-        level >= 4
-    ) {
+        document.body.classList.remove(
+            "screenShake"
+        );
 
-        shakeScreen(
-            150 +
-            level * 30
+        void document.body.offsetWidth;
+
+        document.body.classList.add(
+            "screenShake"
         );
     }
 
+    /*
+        Starting at level 6, flash the screen.
+    */
+    if (level >= 6) {
 
-    if (
-        level >= 6
-    ) {
+        document.body.classList.remove(
+            "screenFlash"
+        );
 
-        flashScreen();
+        void document.body.offsetWidth;
+
+        document.body.classList.add(
+            "screenFlash"
+        );
     }
 
+    updateStats();
 
-    updateUI();
+    setTimeout(() => {
 
+        currentInput = "";
 
-    setTimeout(
-        () => {
+        updateAnswerDisplay();
 
-            currentInput =
-                "";
+        accepting = true;
 
-
-            updateAnswerDisplay();
-
-
-            accepting =
-                true;
-
-        },
-        350
-    );
+    }, 350);
 }
 
 
-/* ==========================================
+/* =========================================================
+   ANSWER SUBMISSION
+========================================================= */
+
+function submitAnswer() {
+
+    if (!accepting) {
+        return;
+    }
+
+    if (currentInput === "") {
+        return;
+    }
+
+    const entered =
+        Number(currentInput);
+
+    if (
+        Number.isFinite(entered) &&
+        entered === currentAnswer
+    ) {
+
+        handleCorrect();
+
+    } else {
+
+        handleWrong();
+
+    }
+}
+
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+function addNumber(number) {
+
+    if (!accepting) {
+        return;
+    }
+
+    /*
+        Prevent unnecessarily enormous input.
+    */
+    if (currentInput.length >= 12) {
+        return;
+    }
+
+    /*
+        Don't allow leading zeroes.
+    */
+    if (
+        currentInput === "0" &&
+        number === 0
+    ) {
+        return;
+    }
+
+    if (
+        currentInput === "0" &&
+        number !== 0
+    ) {
+        currentInput =
+            String(number);
+    } else {
+        currentInput +=
+            String(number);
+    }
+
+    updateAnswerDisplay();
+}
+
+
+function deleteNumber() {
+
+    if (!accepting) {
+        return;
+    }
+
+    currentInput =
+        currentInput.slice(0, -1);
+
+    updateAnswerDisplay();
+}
+
+
+/* =========================================================
    NEXT QUESTION
-========================================== */
+========================================================= */
 
 function nextQuestion() {
 
+    if (!started) {
+        return;
+    }
+
+    generateQuestion();
+
+    accepting = true;
+}
+
+
+/* =========================================================
+   LEVEL TRANSITION
+========================================================= */
+
+function nextLevel() {
+
     if (
-        questionNumber >=
-        QUESTIONS_PER_LEVEL
+        level >= TOTAL_LEVELS
     ) {
 
-        if (
-            level >=
-            TOTAL_LEVELS
-        ) {
-
-            finishGame();
-
-            return;
-        }
-
-
-        level++;
-
-
-        questionNumber =
-            0;
-
-
-        document.body.className =
-            `level${level}`;
-
-
-        if (
-            level <= 3
-        ) {
-
-            showMessage(
-                `LEVEL ${level}`,
-                700
-            );
-
-        } else if (
-            level <= 6
-        ) {
-
-            showMessage(
-                `OH NO\nLEVEL ${level}`,
-                800
-            );
-
-        } else if (
-            level <= 9
-        ) {
-
-            showMessage(
-                `LEVEL ${level}\nWHY`,
-                900
-            );
-
-        } else {
-
-            showMessage(
-                "LEVEL 10\nGOOD LUCK",
-                1200
-            );
-        }
-
-
-        setTimeout(
-            generateQuestion,
-            900
-        );
-
+        finishGame();
 
         return;
     }
 
+    level++;
+
+    questionNumber = 0;
+
+    currentInput = "";
+
+    updateLevelDisplay();
 
     generateQuestion();
+
+    accepting = true;
+
+    startChaosEffects();
 }
 
 
-/* ==========================================
-   UI
-========================================== */
+/* =========================================================
+   CHAOS
+========================================================= */
 
-function updateUI() {
+function startChaosEffects() {
 
-    levelElement.textContent =
-        `LEVEL ${level}`;
-
-
-    questionCountElement.textContent =
-        `${questionNumber} / ${QUESTIONS_PER_LEVEL}`;
-
-
-    correctElement.textContent =
-        `Correct: ${correct}`;
-
-
-    wrongElement.textContent =
-        `Wrong: ${wrong}`;
-
-
-    const totalAnswered =
-        (
-            (level - 1) *
-            QUESTIONS_PER_LEVEL
-        ) +
-        questionNumber;
-
-
-    const percentage =
-        (
-            totalAnswered /
-            TOTAL_QUESTIONS
-        ) *
-        100;
-
-
-    progressElement.style.width =
-        `${percentage}%`;
-}
-
-
-/* ==========================================
-   RANDOM CHOICE
-========================================== */
-
-function randomChoice(array) {
-
-    return array[
-        Math.floor(
-            Math.random() *
-            array.length
-        )
-    ];
-}
-
-
-/* ==========================================
-   MESSAGE
-========================================== */
-
-function showMessage(
-    text,
-    duration
-) {
-
-    messageElement.textContent =
-        text;
-
-
-    messageElement.classList.add(
-        "show"
+    clearInterval(
+        chaosInterval
     );
 
-
-    setTimeout(
-        () => {
-
-            messageElement.classList.remove(
-                "show"
-            );
-
-        },
-        duration
-    );
-}
-
-
-/* ==========================================
-   SHAKE
-========================================== */
-
-function shakeScreen(time) {
-
-    const start =
-        performance.now();
-
-
-    function shake(now) {
-
-        const elapsed =
-            now - start;
-
-
-        if (
-            elapsed >= time
-        ) {
-
-            document.body.style.transform =
-                "";
-
-            return;
-        }
-
-
-        const intensity =
-            Math.min(
-                1,
-                elapsed / 100
-            ) *
-            (
-                level >= 9
-                    ? 7
-                    : 3
-            );
-
-
-        const x =
-            (
-                Math.random() * 2 -
-                1
-            ) *
-            intensity;
-
-
-        const y =
-            (
-                Math.random() * 2 -
-                1
-            ) *
-            intensity;
-
-
-        const rotation =
-            (
-                Math.random() * 2 -
-                1
-            ) *
-            (
-                level >= 9
-                    ? 0.8
-                    : 0.2
-            );
-
-
-        document.body.style.transform =
-            `translate(${x}px, ${y}px)
-             rotate(${rotation}deg)`;
-
-
-        requestAnimationFrame(
-            shake
-        );
+    if (level < 10) {
+        return;
     }
 
+    /*
+        Level 10 becomes progressively more chaotic.
+    */
+    chaosInterval =
+        setInterval(() => {
 
-    requestAnimationFrame(
-        shake
-    );
+            if (!started) {
+                return;
+            }
+
+            const rotation =
+                Math.random() * 8 - 4;
+
+            const scale =
+                0.98 +
+                Math.random() * 0.04;
+
+            questionCard.style.transform =
+                `rotate(${rotation}deg) scale(${scale})`;
+
+            setTimeout(() => {
+
+                questionCard.style.transform =
+                    "";
+
+            }, 350);
+
+        }, 2500);
 }
 
 
-/* ==========================================
-   FLASH
-========================================== */
+/* =========================================================
+   START GAME
+========================================================= */
 
-function flashScreen() {
-
-    const oldFilter =
-        document.body.style.filter;
-
-
-    document.body.style.filter =
-        "invert(1)";
-
-
-    setTimeout(
-        () => {
-
-            document.body.style.filter =
-                oldFilter;
-
-        },
-        level >= 9
-            ? 90
-            : 50
-    );
-}
-
-
-/* ==========================================
-   START
-========================================== */
-
-function startGame() {
-
-    started =
-        true;
-
-
-    level =
-        1;
-
-    questionNumber =
-        0;
-
-    correct =
-        0;
-
-    wrong =
-        0;
-
-    currentInput =
-        "";
-
-    accepting =
-        false;
-
+async function startGame() {
 
     /*
         IMPORTANT:
 
-        Unlock audio immediately from the
-        BEGIN button before doing anything
-        asynchronous.
+        This happens immediately inside the button click.
+        That gives the AudioContext a valid user gesture
+        to resume on browsers such as iOS Safari.
     */
+    await activateAudio();
 
-    initializeAudio();
+    /*
+        Load the MP3 files before accepting answers.
+    */
+    const soundsReady =
+        await loadAudio();
 
+    if (!soundsReady) {
 
-    startScreen.style.display =
-        "none";
+        console.warn(
+            "The game will continue, but audio could not be loaded."
+        );
+    }
 
+    started = true;
 
-    document.body.className =
-        "level1";
+    level = 1;
 
+    questionNumber = 0;
+
+    correct = 0;
+
+    wrong = 0;
+
+    currentInput = "";
+
+    accepting = false;
+
+    clearInterval(
+        chaosInterval
+    );
+
+    startScreen.classList.add(
+        "hidden"
+    );
+
+    finishScreen.classList.add(
+        "hidden"
+    );
+
+    gameScreen.classList.remove(
+        "hidden"
+    );
+
+    updateStats();
+
+    updateLevelDisplay();
 
     generateQuestion();
 
+    accepting = true;
 
-    /*
-        Load the MP3s in the background.
-
-        The game does NOT wait for them.
-    */
-
-    loadAudio();
+    startChaosEffects();
 }
 
 
-/* ==========================================
-   FINISH
-========================================== */
+/* =========================================================
+   FINISH GAME
+========================================================= */
 
 function finishGame() {
 
-    accepting =
-        false;
+    started = false;
 
+    accepting = false;
+
+    clearInterval(
+        chaosInterval
+    );
 
     stopCurrentSound();
 
+    gameScreen.classList.add(
+        "hidden"
+    );
 
-    document.getElementById(
-        "app"
-    ).style.display =
-        "none";
+    finishScreen.classList.remove(
+        "hidden"
+    );
 
+    finalCorrect.textContent =
+        correct;
 
-    finishedScreen.style.display =
-        "flex";
-
-
-    const attempts =
-        correct +
+    finalWrong.textContent =
         wrong;
-
-
-    const accuracy =
-        attempts === 0
-            ? 0
-            : Math.round(
-                (
-                    correct /
-                    attempts
-                ) *
-                100
-            );
-
-
-    finalText.innerHTML = `
-        You survived all
-        <b>1,000 questions.</b>
-        <br><br>
-
-        Correct:
-        <b>${correct}</b>
-        <br>
-
-        Wrong:
-        <b>${wrong}</b>
-        <br>
-
-        Accuracy:
-        <b>${accuracy}%</b>
-        <br><br>
-
-        The calculator has been released.
-    `;
 }
 
 
-/* ==========================================
-   NUMPAD
-========================================== */
+/* =========================================================
+   RESTART
+========================================================= */
 
-numberButtons.forEach(
-    button => {
+function restartGame() {
 
-        button.addEventListener(
-            "pointerdown",
-            event => {
+    finishScreen.classList.add(
+        "hidden"
+    );
 
-                event.preventDefault();
+    startScreen.classList.remove(
+        "hidden"
+    );
+
+    document.body.className = "";
+
+    currentInput = "";
+
+    progressFill.style.width =
+        "0%";
+}
 
 
-                addDigit(
+/* =========================================================
+   NUMPAD EVENTS
+========================================================= */
+
+numberButtons.forEach(button => {
+
+    button.addEventListener(
+        "click",
+        () => {
+
+            const number =
+                Number(
                     button.dataset.number
                 );
-            }
-        );
-    }
-);
 
+            addNumber(number);
+        }
+    );
 
-/* ==========================================
-   DELETE
-========================================== */
+});
+
 
 deleteButton.addEventListener(
-    "pointerdown",
-    event => {
-
-        event.preventDefault();
-
-
-        deleteDigit();
-    }
+    "click",
+    deleteNumber
 );
 
-
-/* ==========================================
-   ENTER
-========================================== */
 
 enterButton.addEventListener(
-    "pointerdown",
-    event => {
-
-        event.preventDefault();
-
-
-        submitAnswer();
-    }
+    "click",
+    submitAnswer
 );
 
 
-/* ==========================================
-   START
-========================================== */
-
-startButton.addEventListener(
-    "pointerdown",
-    event => {
-
-        event.preventDefault();
-
-
-        startGame();
-    }
-);
-
-
-/* ==========================================
-   AGAIN
-========================================== */
-
-againButton.addEventListener(
-    "pointerdown",
-    event => {
-
-        event.preventDefault();
-
-
-        location.reload();
-    }
-);
-
-
-/* ==========================================
-   KEYBOARD
-========================================== */
+/* =========================================================
+   PHYSICAL KEYBOARD
+========================================================= */
 
 document.addEventListener(
     "keydown",
     event => {
 
-        if (!started)
+        if (!started) {
             return;
-
+        }
 
         if (
             event.key >= "0" &&
             event.key <= "9"
         ) {
 
-            addDigit(
-                event.key
+            event.preventDefault();
+
+            addNumber(
+                Number(event.key)
             );
 
             return;
         }
-
 
         if (
             event.key ===
             "Backspace"
         ) {
 
-            deleteDigit();
+            event.preventDefault();
+
+            deleteNumber();
 
             return;
         }
-
 
         if (
             event.key ===
             "Enter"
         ) {
 
+            event.preventDefault();
+
             submitAnswer();
 
-            return;
-        }
-    }
-);
-
-
-/* ==========================================
-   ZOOM PREVENTION
-========================================== */
-
-document.addEventListener(
-    "gesturestart",
-    event => {
-
-        event.preventDefault();
-    }
-);
-
-document.addEventListener(
-    "gesturechange",
-    event => {
-
-        event.preventDefault();
-    }
-);
-
-document.addEventListener(
-    "gestureend",
-    event => {
-
-        event.preventDefault();
-    }
-);
-
-
-let lastTouchEnd =
-    0;
-
-
-document.addEventListener(
-    "touchend",
-    event => {
-
-        const now =
-            Date.now();
-
-
-        if (
-            now -
-            lastTouchEnd <=
-            300
-        ) {
-
-            event.preventDefault();
         }
 
-
-        lastTouchEnd =
-            now;
-
-    },
-    false
+    }
 );
 
 
-/* ==========================================
-   LEVEL 10 CHAOS
-========================================== */
+/* =========================================================
+   BUTTON EVENTS
+========================================================= */
 
-setInterval(
+startButton.addEventListener(
+    "click",
+    startGame
+);
+
+
+restartButton.addEventListener(
+    "click",
+    restartGame
+);
+
+
+/* =========================================================
+   PRELOAD AUDIO
+   =========================================================
+
+   Start loading the sounds immediately so that by the time
+   the player reaches the first 10th correct answer, the
+   buffers should already be available.
+
+   The actual playback still waits for the BEGIN interaction
+   to resume the AudioContext.
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
     () => {
 
-        if (
-            !started ||
-            level < 10
-        ) {
+        initializeAudio();
 
-            return;
-        }
+        loadAudio();
 
-
-        const event =
-            Math.floor(
-                Math.random() * 7
-            );
-
-
-        switch (event) {
-
-            case 0:
-
-                document.title =
-                    "ADD. WHY.";
-
-
-                setTimeout(
-                    () => {
-
-                        document.title =
-                            "ADD.";
-
-                    },
-                    500
-                );
-
-                break;
-
-
-            case 1:
-
-                shakeScreen(
-                    180
-                );
-
-                break;
-
-
-            case 2:
-
-                flashScreen();
-
-                break;
-
-
-            case 3:
-
-                questionElement.style.transform =
-                    `rotate(
-                        ${
-                            Math.random() * 10 -
-                            5
-                        }deg
-                    )
-                    scale(
-                        ${
-                            0.9 +
-                            Math.random() * 0.3
-                        }
-                    )`;
-
-
-                setTimeout(
-                    () => {
-
-                        questionElement.style.transform =
-                            "";
-
-                    },
-                    300
-                );
-
-                break;
-
-
-            case 4:
-
-                showMessage(
-                    "CALCULATE",
-                    250
-                );
-
-                break;
-
-
-            case 5:
-
-                showMessage(
-                    "ADD.",
-                    250
-                );
-
-                break;
-
-
-            case 6:
-
-                document.getElementById(
-                    "title"
-                ).textContent =
-                    randomChoice([
-                        "ADD.",
-                        "ADD???",
-                        "ADD!!!",
-                        "ADDDDD."
-                    ]);
-
-                break;
-        }
-
-    },
-    2500
+    }
 );
 </script>
 
