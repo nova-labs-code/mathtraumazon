@@ -1,0 +1,2136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
+
+<title>ADD.</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    min-height: 100%;
+    background: #080808;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+}
+
+body {
+    transition:
+        background 0.15s,
+        transform 0.1s,
+        filter 0.1s;
+}
+
+button {
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 15px 50px;
+}
+
+#top {
+    width: min(900px, 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+#title {
+    font-size: clamp(30px, 8vw, 55px);
+    font-weight: 1000;
+    letter-spacing: -5px;
+}
+
+#level {
+    border: 2px solid white;
+    padding: 8px 12px;
+    font-weight: 900;
+    font-size: 17px;
+}
+
+#progressContainer {
+    width: min(900px, 100%);
+    height: 12px;
+    border: 2px solid white;
+    margin-bottom: 25px;
+    overflow: hidden;
+}
+
+#progress {
+    width: 0%;
+    height: 100%;
+    background: white;
+    transition: width 0.2s;
+}
+
+#card {
+    width: min(900px, 100%);
+    border: 3px solid white;
+    padding: 30px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    transition:
+        transform 0.15s,
+        border-color 0.15s;
+}
+
+#question {
+    font-size: clamp(34px, 9vw, 95px);
+    font-weight: 1000;
+    text-align: center;
+    line-height: 1.05;
+    word-break: break-word;
+    margin: 15px 0 30px;
+}
+
+#answerDisplay {
+    width: min(600px, 100%);
+    height: 75px;
+
+    border: 3px solid white;
+    background: #111;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: clamp(30px, 8vw, 48px);
+    font-weight: 1000;
+
+    overflow: hidden;
+    white-space: nowrap;
+
+    margin-bottom: 18px;
+}
+
+#answerDisplay.empty::before {
+    content: "ANSWER";
+    opacity: 0.25;
+}
+
+/* ==========================
+   NUMPAD
+========================== */
+
+#keypad {
+    width: min(600px, 100%);
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 8px;
+}
+
+.key {
+    min-height: 65px;
+
+    border: 2px solid white;
+
+    background: #151515;
+    color: white;
+
+    font-size: 27px;
+    font-weight: 900;
+
+    cursor: pointer;
+
+    touch-action: manipulation;
+
+    padding: 0;
+
+    -webkit-user-select: none;
+    user-select: none;
+
+    transition:
+        transform 0.05s,
+        background 0.05s,
+        color 0.05s;
+}
+
+.key:active {
+    transform: scale(0.94);
+    background: white;
+    color: black;
+}
+
+.key.delete {
+    grid-column: 1;
+}
+
+.key.zero {
+    grid-column: 2;
+}
+
+.key.enter {
+    grid-column: 3;
+    background: white;
+    color: black;
+}
+
+.key.enter:active {
+    background: #aaa;
+}
+
+#stats {
+    width: min(900px, 100%);
+
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+
+    margin-top: 20px;
+
+    font-weight: 900;
+}
+
+/* ==========================
+   START / FINISH
+========================== */
+
+#startScreen,
+#finishedScreen {
+    position: fixed;
+    inset: 0;
+
+    z-index: 200;
+
+    background: #080808;
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 25px;
+
+    text-align: center;
+}
+
+#finishedScreen {
+    display: none;
+}
+
+.big {
+    font-size: clamp(60px, 18vw, 160px);
+    font-weight: 1000;
+    letter-spacing: -10px;
+}
+
+.subtitle {
+    max-width: 700px;
+
+    line-height: 1.5;
+
+    font-size: 19px;
+
+    margin: 20px 0 30px;
+}
+
+.startButton {
+    border: 0;
+
+    background: white;
+    color: black;
+
+    padding: 18px 40px;
+
+    font-size: 22px;
+    font-weight: 1000;
+
+    cursor: pointer;
+
+    touch-action: manipulation;
+}
+
+/* ==========================
+   MESSAGE
+========================== */
+
+#message {
+    position: fixed;
+
+    left: 50%;
+    top: 50%;
+
+    z-index: 100;
+
+    transform:
+        translate(-50%, -50%)
+        scale(0);
+
+    font-size:
+        clamp(35px, 12vw, 120px);
+
+    font-weight: 1000;
+
+    text-align: center;
+
+    white-space: pre-line;
+
+    pointer-events: none;
+
+    text-shadow:
+        5px 5px 0 #000;
+
+    transition:
+        transform 0.12s;
+}
+
+#message.show {
+    transform:
+        translate(-50%, -50%)
+        scale(1);
+}
+
+/* ==========================
+   CURSED LEVELS
+========================== */
+
+body.level2 {
+    background: #0b0012;
+}
+
+body.level3 {
+    background: #00110b;
+}
+
+body.level4 {
+    background: #110000;
+}
+
+body.level5 {
+    background: #100f00;
+}
+
+body.level6 {
+    background: #001016;
+}
+
+body.level7 {
+    background: #16000f;
+}
+
+body.level8 {
+    background: #111;
+}
+
+body.level9 {
+    background:
+        repeating-linear-gradient(
+            45deg,
+            #000 0,
+            #000 10px,
+            #181818 10px,
+            #181818 20px
+        );
+}
+
+body.level10 {
+    background: #000;
+}
+
+/* LEVEL 4 */
+
+body.level4 #card {
+    animation:
+        breathe 1.2s infinite alternate;
+}
+
+@keyframes breathe {
+
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.015);
+    }
+}
+
+/* LEVEL 5 */
+
+body.level5 #question {
+    animation:
+        wobble 0.8s infinite;
+}
+
+@keyframes wobble {
+
+    0% {
+        transform: rotate(0);
+    }
+
+    25% {
+        transform: rotate(1deg);
+    }
+
+    50% {
+        transform: rotate(-1deg);
+    }
+
+    75% {
+        transform: rotate(0.5deg);
+    }
+
+    100% {
+        transform: rotate(0);
+    }
+}
+
+/* LEVEL 6 */
+
+body.level6 #answerDisplay {
+    animation:
+        pulseInput 0.7s infinite alternate;
+}
+
+@keyframes pulseInput {
+
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.03);
+    }
+}
+
+/* LEVEL 7 */
+
+body.level7 #title {
+    animation:
+        glitch 0.25s infinite;
+}
+
+@keyframes glitch {
+
+    0% {
+        transform: translate(0);
+    }
+
+    20% {
+        transform: translate(-2px, 1px);
+    }
+
+    40% {
+        transform: translate(2px, -1px);
+    }
+
+    60% {
+        transform: translate(-1px, -2px);
+    }
+
+    80% {
+        transform: translate(1px, 2px);
+    }
+
+    100% {
+        transform: translate(0);
+    }
+}
+
+/* LEVEL 8 */
+
+body.level8 #question {
+    font-family:
+        "Comic Sans MS",
+        cursive;
+}
+
+/* LEVEL 9 */
+
+body.level9 #card {
+    animation:
+        cursedCard 0.35s infinite;
+}
+
+@keyframes cursedCard {
+
+    0% {
+        transform:
+            translate(0)
+            rotate(0);
+    }
+
+    25% {
+        transform:
+            translate(2px, -1px)
+            rotate(0.3deg);
+    }
+
+    50% {
+        transform:
+            translate(-2px, 1px)
+            rotate(-0.3deg);
+    }
+
+    75% {
+        transform:
+            translate(1px, 2px)
+            rotate(0.2deg);
+    }
+
+    100% {
+        transform:
+            translate(0)
+            rotate(0);
+    }
+}
+
+/* LEVEL 10 */
+
+body.level10 #card {
+    border-width: 5px;
+
+    animation:
+        level10Card 0.18s infinite;
+}
+
+body.level10 #question {
+    animation:
+        level10Text 0.3s infinite;
+}
+
+@keyframes level10Card {
+
+    0% {
+        transform:
+            translate(0)
+            rotate(0)
+            scale(1);
+    }
+
+    25% {
+        transform:
+            translate(3px, -2px)
+            rotate(0.5deg)
+            scale(1.01);
+    }
+
+    50% {
+        transform:
+            translate(-3px, 2px)
+            rotate(-0.5deg)
+            scale(0.99);
+    }
+
+    75% {
+        transform:
+            translate(2px, 1px)
+            rotate(0.3deg)
+            scale(1.01);
+    }
+
+    100% {
+        transform:
+            translate(0)
+            rotate(0)
+            scale(1);
+    }
+}
+
+@keyframes level10Text {
+
+    0% {
+        transform: translate(0);
+    }
+
+    20% {
+        transform: translate(-3px, 2px);
+    }
+
+    40% {
+        transform: translate(3px, -2px);
+    }
+
+    60% {
+        transform: translate(2px, 3px);
+    }
+
+    80% {
+        transform: translate(-2px, -3px);
+    }
+
+    100% {
+        transform: translate(0);
+    }
+}
+
+/* ==========================
+   MOBILE
+========================== */
+
+@media (max-width: 600px) {
+
+    #app {
+        padding-top: 12px;
+    }
+
+    #card {
+        padding:
+            20px 10px 25px;
+    }
+
+    #question {
+        margin-top: 10px;
+        margin-bottom: 22px;
+    }
+
+    #answerDisplay {
+        height: 65px;
+        margin-bottom: 12px;
+    }
+
+    .key {
+        min-height: 58px;
+        font-size: 25px;
+    }
+
+    #stats {
+        gap: 12px;
+        font-size: 15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ==========================
+     START SCREEN
+========================== -->
+
+<div id="startScreen">
+
+    <div class="big">
+        ADD.
+    </div>
+
+    <div class="subtitle">
+
+        10 levels.<br>
+        100 questions per level.<br>
+        1,000 additions total.<br>
+
+    </div>
+
+    <button
+        type="button"
+        class="startButton"
+        id="startButton"
+    >
+        BEGIN
+    </button>
+
+</div>
+
+
+<!-- ==========================
+     FINISHED SCREEN
+========================== -->
+
+<div id="finishedScreen">
+
+    <div class="big">
+        DONE.
+    </div>
+
+    <div
+        class="subtitle"
+        id="finalText"
+    ></div>
+
+    <button
+        type="button"
+        class="startButton"
+        id="againButton"
+    >
+        DO IT AGAIN
+    </button>
+
+</div>
+
+
+<!-- ==========================
+     GAME
+========================== -->
+
+<div id="app">
+
+    <div id="top">
+
+        <div id="title">
+            ADD.
+        </div>
+
+        <div id="level">
+            LEVEL 1
+        </div>
+
+    </div>
+
+
+    <div id="progressContainer">
+
+        <div id="progress"></div>
+
+    </div>
+
+
+    <div id="card">
+
+        <div id="question">
+            ---
+        </div>
+
+
+        <div
+            id="answerDisplay"
+            class="empty"
+        ></div>
+
+
+        <!-- ==========================
+             CUSTOM NUMPAD
+        ========================== -->
+
+        <div id="keypad">
+
+            <button
+                type="button"
+                class="key number"
+                data-number="1"
+            >1</button>
+
+            <button
+                type="button"
+                class="key number"
+                data-number="2"
+            >2</button>
+
+            <button
+                type="button"
+                class="key number"
+                data-number="3"
+            >3</button>
+
+            <button
+                type="button"
+                class="key number"
+                data-number="4"
+            >4</button>
+
+            <button
+                type="button"
+                class="key number"
+                data-number="5"
+            >5</button>
+
+            <button
+                type="button"
+                class="key number"
+                data-number="6"
+            >6</button>
+
+            <button
+                type="button"
+                class="key number"
+                data-number="7"
+            >7</button>
+
+            <button
+                type="button"
+                class="key number"
+                data-number="8"
+            >8</button>
+
+            <button
+                type="button"
+                class="key number"
+                data-number="9"
+            >9</button>
+
+            <button
+                type="button"
+                class="key delete"
+                id="deleteButton"
+            >←</button>
+
+            <button
+                type="button"
+                class="key number zero"
+                data-number="0"
+            >0</button>
+
+            <button
+                type="button"
+                class="key enter"
+                id="enterButton"
+            >✓</button>
+
+        </div>
+
+    </div>
+
+
+    <div id="stats">
+
+        <span id="questionCount">
+            0 / 100
+        </span>
+
+        <span id="correct">
+            Correct: 0
+        </span>
+
+        <span id="wrong">
+            Wrong: 0
+        </span>
+
+    </div>
+
+</div>
+
+
+<div id="message"></div>
+
+
+<script>
+"use strict";
+
+/* ==========================================
+   SETTINGS
+========================================== */
+
+const TOTAL_LEVELS = 10;
+
+const QUESTIONS_PER_LEVEL = 100;
+
+const TOTAL_QUESTIONS =
+    TOTAL_LEVELS *
+    QUESTIONS_PER_LEVEL;
+
+
+/* ==========================================
+   GAME STATE
+========================================== */
+
+let level = 1;
+
+let questionNumber = 0;
+
+let correct = 0;
+
+let wrong = 0;
+
+let currentA = 0;
+
+let currentB = 0;
+
+let currentAnswer = 0;
+
+let currentInput = "";
+
+let started = false;
+
+let accepting = false;
+
+
+/* ==========================================
+   ELEMENTS
+========================================== */
+
+const questionElement =
+    document.getElementById(
+        "question"
+    );
+
+const answerDisplay =
+    document.getElementById(
+        "answerDisplay"
+    );
+
+const levelElement =
+    document.getElementById(
+        "level"
+    );
+
+const progressElement =
+    document.getElementById(
+        "progress"
+    );
+
+const questionCountElement =
+    document.getElementById(
+        "questionCount"
+    );
+
+const correctElement =
+    document.getElementById(
+        "correct"
+    );
+
+const wrongElement =
+    document.getElementById(
+        "wrong"
+    );
+
+const messageElement =
+    document.getElementById(
+        "message"
+    );
+
+const startScreen =
+    document.getElementById(
+        "startScreen"
+    );
+
+const finishedScreen =
+    document.getElementById(
+        "finishedScreen"
+    );
+
+const finalText =
+    document.getElementById(
+        "finalText"
+    );
+
+const startButton =
+    document.getElementById(
+        "startButton"
+    );
+
+const againButton =
+    document.getElementById(
+        "againButton"
+    );
+
+const deleteButton =
+    document.getElementById(
+        "deleteButton"
+    );
+
+const enterButton =
+    document.getElementById(
+        "enterButton"
+    );
+
+
+/* ==========================================
+   WRONG ANSWER AUDIO
+========================================== */
+
+/*
+    Wrong.mp3 must be in the same folder
+    as this HTML file.
+*/
+
+const wrongSound =
+    new Audio("Wrong.mp3");
+
+wrongSound.preload = "auto";
+
+
+const numberButtons =
+    document.querySelectorAll(
+        ".number"
+    );
+
+
+/* ==========================================
+   RANDOM NUMBER
+========================================== */
+
+function randomNumberWithDigits(
+    digits
+) {
+
+    if (digits === 1) {
+
+        return Math.floor(
+            Math.random() * 10
+        );
+    }
+
+    const minimum =
+        10 ** (digits - 1);
+
+    const maximum =
+        (10 ** digits) - 1;
+
+    return Math.floor(
+        Math.random() *
+        (
+            maximum -
+            minimum +
+            1
+        )
+    ) + minimum;
+}
+
+
+/* ==========================================
+   GENERATE QUESTION
+========================================== */
+
+function generateQuestion() {
+
+    currentA =
+        randomNumberWithDigits(
+            level
+        );
+
+    currentB =
+        randomNumberWithDigits(
+            level
+        );
+
+    currentAnswer =
+        currentA + currentB;
+
+    currentInput = "";
+
+    updateAnswerDisplay();
+
+
+    const a =
+        currentA.toLocaleString();
+
+    const b =
+        currentB.toLocaleString();
+
+
+    if (level >= 8) {
+
+        const operators = [
+            "+",
+            "＋",
+            "⊕",
+            "PLUS",
+            "+ +",
+            "ADD"
+        ];
+
+        const operator =
+            randomChoice(
+                operators
+            );
+
+        questionElement.textContent =
+            `${a} ${operator} ${b}`;
+
+    } else {
+
+        questionElement.textContent =
+            `${a} + ${b}`;
+    }
+
+
+    accepting = true;
+
+    updateUI();
+}
+
+
+/* ==========================================
+   DISPLAY ANSWER
+========================================== */
+
+function updateAnswerDisplay() {
+
+    if (currentInput.length === 0) {
+
+        answerDisplay.textContent = "";
+
+        answerDisplay.classList.add(
+            "empty"
+        );
+
+        return;
+    }
+
+
+    answerDisplay.classList.remove(
+        "empty"
+    );
+
+
+    answerDisplay.textContent =
+        Number(
+            currentInput
+        ).toLocaleString();
+}
+
+
+/* ==========================================
+   ADD DIGIT
+========================================== */
+
+function addDigit(digit) {
+
+    if (!started)
+        return;
+
+    if (!accepting)
+        return;
+
+
+    /*
+        Largest possible answer:
+
+        9,999,999,999
+        +
+        9,999,999,999
+        =
+        19,999,999,998
+
+        Therefore 11 input digits
+        is enough.
+    */
+
+    if (currentInput.length >= 11)
+        return;
+
+
+    /*
+        Don't create leading zeros.
+    */
+
+    if (
+        currentInput === "0"
+    ) {
+
+        if (digit === "0")
+            return;
+
+        currentInput = digit;
+
+    } else {
+
+        currentInput += digit;
+    }
+
+
+    updateAnswerDisplay();
+}
+
+
+/* ==========================================
+   DELETE
+========================================== */
+
+function deleteDigit() {
+
+    if (!started)
+        return;
+
+    if (!accepting)
+        return;
+
+
+    currentInput =
+        currentInput.slice(
+            0,
+            -1
+        );
+
+
+    updateAnswerDisplay();
+}
+
+
+/* ==========================================
+   SUBMIT
+========================================== */
+
+function submitAnswer() {
+
+    if (!started)
+        return;
+
+    if (!accepting)
+        return;
+
+    if (currentInput === "")
+        return;
+
+
+    const submitted =
+        Number(
+            currentInput
+        );
+
+
+    if (
+        !Number.isSafeInteger(
+            submitted
+        )
+    ) {
+
+        return;
+    }
+
+
+    if (
+        submitted ===
+        currentAnswer
+    ) {
+
+        handleCorrect();
+
+    } else {
+
+        handleWrong();
+    }
+}
+
+
+/* ==========================================
+   CORRECT
+========================================== */
+
+function handleCorrect() {
+
+    accepting = false;
+
+    correct++;
+
+    questionNumber++;
+
+
+    if (level <= 3) {
+
+        showMessage(
+            "✓",
+            250
+        );
+
+    }
+
+    else if (level === 4) {
+
+        showMessage(
+            randomChoice([
+                "CORRECT",
+                "NICE",
+                "GOOD",
+                "OKAY"
+            ]),
+            300
+        );
+
+    }
+
+    else if (level === 5) {
+
+        showMessage(
+            randomChoice([
+                "CORRECT",
+                "WHY",
+                "GOOD JOB?",
+                "CONTINUE"
+            ]),
+            350
+        );
+
+    }
+
+    else if (level === 6) {
+
+        showMessage(
+            randomChoice([
+                "CORRECT.",
+                "UNFORTUNATELY.",
+                "AGAIN.",
+                "KEEP GOING.",
+                "YOU KNOW TOO MUCH."
+            ]),
+            400
+        );
+
+        shakeScreen(150);
+
+    }
+
+    else if (level === 7) {
+
+        showMessage(
+            randomChoice([
+                "CORRECT",
+                "THE NUMBERS KNOW",
+                "GOOD",
+                "STOP",
+                "NO",
+                "YES"
+            ]),
+            450
+        );
+
+        shakeScreen(200);
+
+    }
+
+    else if (level === 8) {
+
+        showMessage(
+            randomChoice([
+                "CORRECT???",
+                "WHY",
+                "NICE",
+                "THE ANSWER WAS REAL",
+                "CONTINUE",
+                "ERROR"
+            ]),
+            500
+        );
+
+        shakeScreen(250);
+
+    }
+
+    else if (level === 9) {
+
+        showMessage(
+            randomChoice([
+                "CORRECT",
+                "CORRECT",
+                "CORRECT",
+                "STOP ADDING",
+                "YOU CANNOT ESCAPE"
+            ]),
+            550
+        );
+
+        shakeScreen(350);
+
+        flashScreen();
+
+    }
+
+    else {
+
+        showMessage(
+            randomChoice([
+                "CORRECT",
+                "THE FINAL LEVEL",
+                "WHY ARE YOU STILL HERE",
+                "10 DIGITS",
+                "CALCULATE"
+            ]),
+            600
+        );
+
+        shakeScreen(500);
+
+        flashScreen();
+    }
+
+
+    setTimeout(
+        nextQuestion,
+        250
+    );
+}
+
+
+/* ==========================================
+   WRONG
+========================================== */
+
+function handleWrong() {
+
+    accepting = false;
+
+    wrong++;
+
+
+    /* ======================================
+       PLAY WRONG SOUND
+    ====================================== */
+
+    wrongSound.currentTime = 0;
+
+    wrongSound.play().catch(
+        error => {
+
+            console.error(
+                "Could not play Wrong.mp3:",
+                error
+            );
+
+        }
+    );
+
+
+    showMessage(
+        level >= 7
+            ? "WRONG."
+            : "✕",
+
+        level >= 7
+            ? 450
+            : 250
+    );
+
+
+    answerDisplay.classList.remove(
+        "shake"
+    );
+
+
+    void answerDisplay.offsetWidth;
+
+
+    answerDisplay.classList.add(
+        "shake"
+    );
+
+
+    if (level >= 4) {
+
+        shakeScreen(
+            150 +
+            level * 30
+        );
+    }
+
+
+    if (level >= 6) {
+
+        flashScreen();
+    }
+
+
+    setTimeout(
+        () => {
+
+            currentInput = "";
+
+            updateAnswerDisplay();
+
+            accepting = true;
+
+        },
+        350
+    );
+}
+
+
+/* ==========================================
+   NEXT QUESTION
+========================================== */
+
+function nextQuestion() {
+
+    if (
+        questionNumber >=
+        QUESTIONS_PER_LEVEL
+    ) {
+
+        if (
+            level >=
+            TOTAL_LEVELS
+        ) {
+
+            finishGame();
+
+            return;
+        }
+
+
+        level++;
+
+        questionNumber = 0;
+
+
+        document.body.className =
+            `level${level}`;
+
+
+        if (level <= 3) {
+
+            showMessage(
+                `LEVEL ${level}`,
+                700
+            );
+
+        }
+
+        else if (level <= 6) {
+
+            showMessage(
+                `OH NO\nLEVEL ${level}`,
+                800
+            );
+
+        }
+
+        else if (level <= 9) {
+
+            showMessage(
+                `LEVEL ${level}\nWHY`,
+                900
+            );
+
+        }
+
+        else {
+
+            showMessage(
+                "LEVEL 10\nGOOD LUCK",
+                1200
+            );
+        }
+
+
+        setTimeout(
+            generateQuestion,
+            900
+        );
+
+        return;
+    }
+
+
+    generateQuestion();
+}
+
+
+/* ==========================================
+   UI
+========================================== */
+
+function updateUI() {
+
+    levelElement.textContent =
+        `LEVEL ${level}`;
+
+
+    questionCountElement.textContent =
+        `${questionNumber} / ${QUESTIONS_PER_LEVEL}`;
+
+
+    correctElement.textContent =
+        `Correct: ${correct}`;
+
+
+    wrongElement.textContent =
+        `Wrong: ${wrong}`;
+
+
+    const totalAnswered =
+        (
+            (level - 1) *
+            QUESTIONS_PER_LEVEL
+        ) +
+        questionNumber;
+
+
+    const percentage =
+        (
+            totalAnswered /
+            TOTAL_QUESTIONS
+        ) *
+        100;
+
+
+    progressElement.style.width =
+        `${percentage}%`;
+}
+
+
+/* ==========================================
+   RANDOM CHOICE
+========================================== */
+
+function randomChoice(array) {
+
+    return array[
+        Math.floor(
+            Math.random() *
+            array.length
+        )
+    ];
+}
+
+
+/* ==========================================
+   MESSAGE
+========================================== */
+
+function showMessage(
+    text,
+    duration
+) {
+
+    messageElement.textContent =
+        text;
+
+    messageElement.classList.add(
+        "show"
+    );
+
+
+    setTimeout(
+        () => {
+
+            messageElement.classList.remove(
+                "show"
+            );
+
+        },
+        duration
+    );
+}
+
+
+/* ==========================================
+   SHAKE
+========================================== */
+
+function shakeScreen(time) {
+
+    const start =
+        performance.now();
+
+
+    function shake(now) {
+
+        const elapsed =
+            now - start;
+
+
+        if (
+            elapsed >= time
+        ) {
+
+            document.body.style.transform =
+                "";
+
+            return;
+        }
+
+
+        const intensity =
+            Math.min(
+                1,
+                elapsed / 100
+            ) *
+            (
+                level >= 9
+                    ? 7
+                    : 3
+            );
+
+
+        const x =
+            (
+                Math.random() * 2 -
+                1
+            ) *
+            intensity;
+
+
+        const y =
+            (
+                Math.random() * 2 -
+                1
+            ) *
+            intensity;
+
+
+        const rotation =
+            (
+                Math.random() * 2 -
+                1
+            ) *
+            (
+                level >= 9
+                    ? 0.8
+                    : 0.2
+            );
+
+
+        document.body.style.transform =
+            `translate(${x}px, ${y}px)
+             rotate(${rotation}deg)`;
+
+
+        requestAnimationFrame(
+            shake
+        );
+    }
+
+
+    requestAnimationFrame(
+        shake
+    );
+}
+
+
+/* ==========================================
+   FLASH
+========================================== */
+
+function flashScreen() {
+
+    const oldFilter =
+        document.body.style.filter;
+
+
+    document.body.style.filter =
+        "invert(1)";
+
+
+    setTimeout(
+        () => {
+
+            document.body.style.filter =
+                oldFilter;
+
+        },
+        level >= 9
+            ? 90
+            : 50
+    );
+}
+
+
+/* ==========================================
+   START
+========================================== */
+
+function startGame() {
+
+    started = true;
+
+    level = 1;
+
+    questionNumber = 0;
+
+    correct = 0;
+
+    wrong = 0;
+
+    currentInput = "";
+
+    accepting = false;
+
+
+    document.body.className =
+        "level1";
+
+
+    startScreen.style.display =
+        "none";
+
+
+    generateQuestion();
+}
+
+
+/* ==========================================
+   FINISH
+========================================== */
+
+function finishGame() {
+
+    accepting = false;
+
+
+    document.getElementById(
+        "app"
+    ).style.display = "none";
+
+
+    finishedScreen.style.display =
+        "flex";
+
+
+    const attempts =
+        correct + wrong;
+
+
+    const accuracy =
+        attempts === 0
+            ? 0
+            : Math.round(
+                (
+                    correct /
+                    attempts
+                ) *
+                100
+            );
+
+
+    finalText.innerHTML = `
+        You survived all
+        <b>1,000 questions.</b>
+        <br><br>
+
+        Correct:
+        <b>${correct}</b>
+        <br>
+
+        Wrong:
+        <b>${wrong}</b>
+        <br>
+
+        Accuracy:
+        <b>${accuracy}%</b>
+        <br><br>
+
+        The calculator has been released.
+    `;
+}
+
+
+/* ==========================================
+   NUMPAD
+========================================== */
+
+numberButtons.forEach(
+    button => {
+
+        button.addEventListener(
+            "pointerdown",
+            event => {
+
+                event.preventDefault();
+
+                const digit =
+                    button.dataset.number;
+
+                addDigit(digit);
+            }
+        );
+    }
+);
+
+
+/* ==========================================
+   DELETE BUTTON
+========================================== */
+
+deleteButton.addEventListener(
+    "pointerdown",
+    event => {
+
+        event.preventDefault();
+
+        deleteDigit();
+    }
+);
+
+
+/* ==========================================
+   ENTER BUTTON
+========================================== */
+
+enterButton.addEventListener(
+    "pointerdown",
+    event => {
+
+        event.preventDefault();
+
+        submitAnswer();
+    }
+);
+
+
+/* ==========================================
+   START BUTTON
+========================================== */
+
+startButton.addEventListener(
+    "pointerdown",
+    event => {
+
+        event.preventDefault();
+
+        startGame();
+    }
+);
+
+
+/* ==========================================
+   AGAIN BUTTON
+========================================== */
+
+againButton.addEventListener(
+    "pointerdown",
+    event => {
+
+        event.preventDefault();
+
+        location.reload();
+    }
+);
+
+
+/* ==========================================
+   PHYSICAL KEYBOARD
+========================================== */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (!started)
+            return;
+
+
+        if (
+            event.key >= "0" &&
+            event.key <= "9"
+        ) {
+
+            addDigit(
+                event.key
+            );
+
+            return;
+        }
+
+
+        if (
+            event.key ===
+            "Backspace"
+        ) {
+
+            deleteDigit();
+
+            return;
+        }
+
+
+        if (
+            event.key ===
+            "Enter"
+        ) {
+
+            submitAnswer();
+
+            return;
+        }
+    }
+);
+
+
+/* ==========================================
+   MOBILE ZOOM PREVENTION
+========================================== */
+
+document.addEventListener(
+    "gesturestart",
+    event => {
+
+        event.preventDefault();
+
+    }
+);
+
+document.addEventListener(
+    "gesturechange",
+    event => {
+
+        event.preventDefault();
+
+    }
+);
+
+document.addEventListener(
+    "gestureend",
+    event => {
+
+        event.preventDefault();
+
+    }
+);
+
+
+let lastTouchEnd = 0;
+
+
+document.addEventListener(
+    "touchend",
+    event => {
+
+        const now =
+            Date.now();
+
+
+        if (
+            now - lastTouchEnd <=
+            300
+        ) {
+
+            event.preventDefault();
+
+        }
+
+
+        lastTouchEnd = now;
+
+    },
+    false
+);
+
+
+/* ==========================================
+   LEVEL 10 CHAOS
+========================================== */
+
+setInterval(
+    () => {
+
+        if (
+            !started ||
+            level < 10
+        ) {
+
+            return;
+        }
+
+
+        const event =
+            Math.floor(
+                Math.random() * 7
+            );
+
+
+        switch (event) {
+
+            case 0:
+
+                document.title =
+                    "ADD. WHY.";
+
+                setTimeout(
+                    () => {
+
+                        document.title =
+                            "ADD.";
+
+                    },
+                    500
+                );
+
+                break;
+
+
+            case 1:
+
+                shakeScreen(180);
+
+                break;
+
+
+            case 2:
+
+                flashScreen();
+
+                break;
+
+
+            case 3:
+
+                questionElement.style.transform =
+                    `rotate(
+                        ${
+                            Math.random() * 10 -
+                            5
+                        }deg
+                    )
+                    scale(
+                        ${
+                            0.9 +
+                            Math.random() * 0.3
+                        }
+                    )`;
+
+
+                setTimeout(
+                    () => {
+
+                        questionElement.style.transform =
+                            "";
+
+                    },
+                    300
+                );
+
+                break;
+
+
+            case 4:
+
+                showMessage(
+                    "CALCULATE",
+                    250
+                );
+
+                break;
+
+
+            case 5:
+
+                showMessage(
+                    "ADD.",
+                    250
+                );
+
+                break;
+
+
+            case 6:
+
+                document.getElementById(
+                    "title"
+                ).textContent =
+                    randomChoice([
+                        "ADD.",
+                        "ADD???",
+                        "ADD!!!",
+                        "ADDDDD."
+                    ]);
+
+                break;
+        }
+
+    },
+    2500
+);
+</script>
+
+</body>
+</html>
