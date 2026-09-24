@@ -132,6 +132,36 @@ button {
     opacity: 0.25;
 }
 
+#answerDisplay.shake {
+    animation: answerShake 0.35s;
+}
+
+@keyframes answerShake {
+    0% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-10px);
+    }
+
+    40% {
+        transform: translateX(10px);
+    }
+
+    60% {
+        transform: translateX(-8px);
+    }
+
+    80% {
+        transform: translateX(8px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
 /* ==========================
    NUMPAD
 ========================== */
@@ -358,15 +388,12 @@ body.level10 {
     background: #000;
 }
 
-/* LEVEL 4 */
-
 body.level4 #card {
     animation:
         breathe 1.2s infinite alternate;
 }
 
 @keyframes breathe {
-
     from {
         transform: scale(1);
     }
@@ -376,15 +403,12 @@ body.level4 #card {
     }
 }
 
-/* LEVEL 5 */
-
 body.level5 #question {
     animation:
         wobble 0.8s infinite;
 }
 
 @keyframes wobble {
-
     0% {
         transform: rotate(0);
     }
@@ -406,15 +430,12 @@ body.level5 #question {
     }
 }
 
-/* LEVEL 6 */
-
 body.level6 #answerDisplay {
     animation:
         pulseInput 0.7s infinite alternate;
 }
 
 @keyframes pulseInput {
-
     from {
         transform: scale(1);
     }
@@ -424,15 +445,12 @@ body.level6 #answerDisplay {
     }
 }
 
-/* LEVEL 7 */
-
 body.level7 #title {
     animation:
         glitch 0.25s infinite;
 }
 
 @keyframes glitch {
-
     0% {
         transform: translate(0);
     }
@@ -458,15 +476,11 @@ body.level7 #title {
     }
 }
 
-/* LEVEL 8 */
-
 body.level8 #question {
     font-family:
         "Comic Sans MS",
         cursive;
 }
-
-/* LEVEL 9 */
 
 body.level9 #card {
     animation:
@@ -474,7 +488,6 @@ body.level9 #card {
 }
 
 @keyframes cursedCard {
-
     0% {
         transform:
             translate(0)
@@ -506,8 +519,6 @@ body.level9 #card {
     }
 }
 
-/* LEVEL 10 */
-
 body.level10 #card {
     border-width: 5px;
 
@@ -521,7 +532,6 @@ body.level10 #question {
 }
 
 @keyframes level10Card {
-
     0% {
         transform:
             translate(0)
@@ -559,7 +569,6 @@ body.level10 #question {
 }
 
 @keyframes level10Text {
-
     0% {
         transform: translate(0);
     }
@@ -625,10 +634,6 @@ body.level10 #question {
 
 <body>
 
-<!-- ==========================
-     START SCREEN
-========================== -->
-
 <div id="startScreen">
 
     <div class="big">
@@ -636,11 +641,9 @@ body.level10 #question {
     </div>
 
     <div class="subtitle">
-
         10 levels.<br>
         100 questions per level.<br>
-        1,000 additions total.<br>
-
+        1,000 additions total.
     </div>
 
     <button
@@ -653,10 +656,6 @@ body.level10 #question {
 
 </div>
 
-
-<!-- ==========================
-     FINISHED SCREEN
-========================== -->
 
 <div id="finishedScreen">
 
@@ -679,10 +678,6 @@ body.level10 #question {
 
 </div>
 
-
-<!-- ==========================
-     GAME
-========================== -->
 
 <div id="app">
 
@@ -718,10 +713,6 @@ body.level10 #question {
             class="empty"
         ></div>
 
-
-        <!-- ==========================
-             CUSTOM NUMPAD
-        ========================== -->
 
         <div id="keypad">
 
@@ -944,26 +935,210 @@ const enterButton =
         "enterButton"
     );
 
-
-/* ==========================================
-   WRONG ANSWER AUDIO
-========================================== */
-
-/*
-    Wrong.mp3 must be in the same folder
-    as this HTML file.
-*/
-
-const wrongSound =
-    new Audio("Wrong.mp3");
-
-wrongSound.preload = "auto";
-
-
 const numberButtons =
     document.querySelectorAll(
         ".number"
     );
+
+
+/* ==========================================
+   AUDIO ENGINE
+========================================== */
+
+/*
+    Web Audio API is used instead of
+    HTMLAudioElement.
+
+    This means there is no <audio> element
+    or media player being created for these
+    effects.
+
+    Files:
+        Wrong.mp3
+        Correct.mp3
+*/
+
+let audioContext = null;
+
+let wrongBuffer = null;
+
+let correctBuffer = null;
+
+
+/* ==========================================
+   INITIALIZE AUDIO
+========================================== */
+
+function initializeAudio() {
+
+    if (!audioContext) {
+
+        const AudioContext =
+            window.AudioContext ||
+            window.webkitAudioContext;
+
+        if (!AudioContext) {
+
+            console.warn(
+                "Web Audio API is not supported."
+            );
+
+            return;
+        }
+
+        audioContext =
+            new AudioContext();
+    }
+
+
+    if (
+        audioContext.state ===
+        "suspended"
+    ) {
+
+        audioContext.resume();
+    }
+}
+
+
+/* ==========================================
+   LOAD SOUND
+========================================== */
+
+async function loadSound(
+    file
+) {
+
+    try {
+
+        const response =
+            await fetch(file);
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Could not load ${file}`
+            );
+        }
+
+
+        const arrayBuffer =
+            await response.arrayBuffer();
+
+
+        return await audioContext.decodeAudioData(
+            arrayBuffer
+        );
+
+    } catch (error) {
+
+        console.error(
+            `Could not load ${file}:`,
+            error
+        );
+
+        return null;
+    }
+}
+
+
+/* ==========================================
+   LOAD ALL SOUNDS
+========================================== */
+
+async function loadAudio() {
+
+    initializeAudio();
+
+
+    if (!audioContext)
+        return;
+
+
+    [
+        wrongBuffer,
+        correctBuffer
+    ] = await Promise.all([
+        loadSound("Wrong.mp3"),
+        loadSound("Correct.mp3")
+    ]);
+}
+
+
+/* ==========================================
+   PLAY SOUND
+========================================== */
+
+function playSound(
+    buffer
+) {
+
+    if (
+        !audioContext ||
+        !buffer
+    ) {
+
+        return;
+    }
+
+
+    if (
+        audioContext.state ===
+        "suspended"
+    ) {
+
+        audioContext.resume();
+    }
+
+
+    const source =
+        audioContext.createBufferSource();
+
+
+    source.buffer =
+        buffer;
+
+
+    const gain =
+        audioContext.createGain();
+
+
+    gain.gain.value = 1;
+
+
+    source.connect(gain);
+
+    gain.connect(
+        audioContext.destination
+    );
+
+
+    source.start(0);
+}
+
+
+/* ==========================================
+   PLAY WRONG
+========================================== */
+
+function playWrongSound() {
+
+    playSound(
+        wrongBuffer
+    );
+}
+
+
+/* ==========================================
+   PLAY CORRECT
+========================================== */
+
+function playCorrectSound() {
+
+    playSound(
+        correctBuffer
+    );
+}
 
 
 /* ==========================================
@@ -981,11 +1156,13 @@ function randomNumberWithDigits(
         );
     }
 
+
     const minimum =
         10 ** (digits - 1);
 
     const maximum =
         (10 ** digits) - 1;
+
 
     return Math.floor(
         Math.random() *
@@ -1045,6 +1222,7 @@ function generateQuestion() {
                 operators
             );
 
+
         questionElement.textContent =
             `${a} ${operator} ${b}`;
 
@@ -1067,7 +1245,9 @@ function generateQuestion() {
 
 function updateAnswerDisplay() {
 
-    if (currentInput.length === 0) {
+    if (
+        currentInput.length === 0
+    ) {
 
         answerDisplay.textContent = "";
 
@@ -1104,39 +1284,33 @@ function addDigit(digit) {
         return;
 
 
-    /*
-        Largest possible answer:
+    if (
+        currentInput.length >= 11
+    ) {
 
-        9,999,999,999
-        +
-        9,999,999,999
-        =
-        19,999,999,998
-
-        Therefore 11 input digits
-        is enough.
-    */
-
-    if (currentInput.length >= 11)
         return;
+    }
 
-
-    /*
-        Don't create leading zeros.
-    */
 
     if (
         currentInput === "0"
     ) {
 
-        if (digit === "0")
-            return;
+        if (
+            digit === "0"
+        ) {
 
-        currentInput = digit;
+            return;
+        }
+
+
+        currentInput =
+            digit;
 
     } else {
 
-        currentInput += digit;
+        currentInput +=
+            digit;
     }
 
 
@@ -1180,8 +1354,12 @@ function submitAnswer() {
     if (!accepting)
         return;
 
-    if (currentInput === "")
+    if (
+        currentInput === ""
+    ) {
+
         return;
+    }
 
 
     const submitted =
@@ -1224,6 +1402,12 @@ function handleCorrect() {
 
     correct++;
 
+
+    /* PLAY CORRECT SOUND */
+
+    playCorrectSound();
+
+
     questionNumber++;
 
 
@@ -1234,9 +1418,7 @@ function handleCorrect() {
             250
         );
 
-    }
-
-    else if (level === 4) {
+    } else if (level === 4) {
 
         showMessage(
             randomChoice([
@@ -1248,9 +1430,7 @@ function handleCorrect() {
             300
         );
 
-    }
-
-    else if (level === 5) {
+    } else if (level === 5) {
 
         showMessage(
             randomChoice([
@@ -1262,9 +1442,7 @@ function handleCorrect() {
             350
         );
 
-    }
-
-    else if (level === 6) {
+    } else if (level === 6) {
 
         showMessage(
             randomChoice([
@@ -1279,9 +1457,7 @@ function handleCorrect() {
 
         shakeScreen(150);
 
-    }
-
-    else if (level === 7) {
+    } else if (level === 7) {
 
         showMessage(
             randomChoice([
@@ -1297,9 +1473,7 @@ function handleCorrect() {
 
         shakeScreen(200);
 
-    }
-
-    else if (level === 8) {
+    } else if (level === 8) {
 
         showMessage(
             randomChoice([
@@ -1315,9 +1489,7 @@ function handleCorrect() {
 
         shakeScreen(250);
 
-    }
-
-    else if (level === 9) {
+    } else if (level === 9) {
 
         showMessage(
             randomChoice([
@@ -1334,9 +1506,7 @@ function handleCorrect() {
 
         flashScreen();
 
-    }
-
-    else {
+    } else {
 
         showMessage(
             randomChoice([
@@ -1353,6 +1523,9 @@ function handleCorrect() {
 
         flashScreen();
     }
+
+
+    updateUI();
 
 
     setTimeout(
@@ -1373,22 +1546,9 @@ function handleWrong() {
     wrong++;
 
 
-    /* ======================================
-       PLAY WRONG SOUND
-    ====================================== */
+    /* PLAY WRONG SOUND */
 
-    wrongSound.currentTime = 0;
-
-    wrongSound.play().catch(
-        error => {
-
-            console.error(
-                "Could not play Wrong.mp3:",
-                error
-            );
-
-        }
-    );
+    playWrongSound();
 
 
     showMessage(
@@ -1428,6 +1588,9 @@ function handleWrong() {
 
         flashScreen();
     }
+
+
+    updateUI();
 
 
     setTimeout(
@@ -1483,27 +1646,21 @@ function nextQuestion() {
                 700
             );
 
-        }
-
-        else if (level <= 6) {
+        } else if (level <= 6) {
 
             showMessage(
                 `OH NO\nLEVEL ${level}`,
                 800
             );
 
-        }
-
-        else if (level <= 9) {
+        } else if (level <= 9) {
 
             showMessage(
                 `LEVEL ${level}\nWHY`,
                 900
             );
 
-        }
-
-        else {
+        } else {
 
             showMessage(
                 "LEVEL 10\nGOOD LUCK",
@@ -1729,7 +1886,7 @@ function flashScreen() {
    START
 ========================================== */
 
-function startGame() {
+async function startGame() {
 
     started = true;
 
@@ -1746,12 +1903,39 @@ function startGame() {
     accepting = false;
 
 
-    document.body.className =
-        "level1";
+    /*
+        IMPORTANT:
+
+        This happens because the user
+        physically pressed BEGIN.
+
+        That allows iOS Safari to unlock
+        the Web Audio context.
+    */
+
+    initializeAudio();
 
 
     startScreen.style.display =
         "none";
+
+
+    document.body.className =
+        "level1";
+
+
+    /*
+        Load the sounds after the audio
+        context has been activated.
+    */
+
+    if (
+        !wrongBuffer ||
+        !correctBuffer
+    ) {
+
+        await loadAudio();
+    }
 
 
     generateQuestion();
@@ -1838,7 +2022,7 @@ numberButtons.forEach(
 
 
 /* ==========================================
-   DELETE BUTTON
+   DELETE
 ========================================== */
 
 deleteButton.addEventListener(
@@ -1853,7 +2037,7 @@ deleteButton.addEventListener(
 
 
 /* ==========================================
-   ENTER BUTTON
+   ENTER
 ========================================== */
 
 enterButton.addEventListener(
@@ -1868,7 +2052,7 @@ enterButton.addEventListener(
 
 
 /* ==========================================
-   START BUTTON
+   START
 ========================================== */
 
 startButton.addEventListener(
@@ -1883,7 +2067,7 @@ startButton.addEventListener(
 
 
 /* ==========================================
-   AGAIN BUTTON
+   AGAIN
 ========================================== */
 
 againButton.addEventListener(
