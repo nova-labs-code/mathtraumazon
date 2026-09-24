@@ -634,6 +634,10 @@ body.level10 #question {
 
 <body>
 
+<!-- ==========================
+     START SCREEN
+========================== -->
+
 <div id="startScreen">
 
     <div class="big">
@@ -657,6 +661,10 @@ body.level10 #question {
 </div>
 
 
+<!-- ==========================
+     FINISH SCREEN
+========================== -->
+
 <div id="finishedScreen">
 
     <div class="big">
@@ -678,6 +686,10 @@ body.level10 #question {
 
 </div>
 
+
+<!-- ==========================
+     GAME
+========================== -->
 
 <div id="app">
 
@@ -713,6 +725,10 @@ body.level10 #question {
             class="empty"
         ></div>
 
+
+        <!-- ==========================
+             NUMPAD
+        ========================== -->
 
         <div id="keypad">
 
@@ -945,11 +961,32 @@ const numberButtons =
    AUDIO ENGINE
 ========================================== */
 
+/*
+    Audio is handled entirely through the
+    Web Audio API.
+
+    No <audio> elements are created.
+
+    Files:
+
+        Wrong.mp3
+        Correct.mp3
+*/
+
 let audioContext = null;
 
 let wrongBuffer = null;
 
 let correctBuffer = null;
+
+
+/*
+    This stores the ONE sound currently
+    playing.
+
+    A new sound always stops the old one
+    first, preventing overlap.
+*/
 
 let currentSoundSource = null;
 
@@ -966,20 +1003,29 @@ function initializeAudio() {
             window.AudioContext ||
             window.webkitAudioContext;
 
+
         if (!AudioContext) {
 
             console.warn(
                 "Web Audio API is not supported."
             );
 
-            return null;
+            return;
         }
+
 
         audioContext =
             new AudioContext();
     }
 
-    return audioContext;
+
+    if (
+        audioContext.state ===
+        "suspended"
+    ) {
+
+        audioContext.resume();
+    }
 }
 
 
@@ -987,40 +1033,18 @@ function initializeAudio() {
    LOAD SOUND
 ========================================== */
 
-async function loadSound(
-    file
-) {
+async function loadSound(file) {
 
     try {
 
-        /*
-            The filename is resolved relative
-            to the HTML document.
-
-            Example:
-
-            index.html
-            Wrong.mp3
-            Correct.mp3
-        */
-
-        const soundURL =
-            new URL(
-                file,
-                document.baseURI
-            );
-
-
         const response =
-            await fetch(
-                soundURL.href
-            );
+            await fetch(file);
 
 
         if (!response.ok) {
 
             throw new Error(
-                `Could not load ${file}: HTTP ${response.status}`
+                `Could not load ${file}`
             );
         }
 
@@ -1040,6 +1064,7 @@ async function loadSound(
             error
         );
 
+
         return null;
     }
 }
@@ -1053,9 +1078,9 @@ async function loadAudio() {
 
     initializeAudio();
 
-    if (!audioContext) {
+
+    if (!audioContext)
         return;
-    }
 
 
     [
@@ -1063,9 +1088,13 @@ async function loadAudio() {
         correctBuffer
     ] = await Promise.all([
 
-        loadSound("Wrong.mp3"),
+        loadSound(
+            "Wrong.mp3"
+        ),
 
-        loadSound("Correct.mp3")
+        loadSound(
+            "Correct.mp3"
+        )
 
     ]);
 }
@@ -1077,7 +1106,10 @@ async function loadAudio() {
 
 function stopCurrentSound() {
 
-    if (!currentSoundSource) {
+    if (
+        !currentSoundSource
+    ) {
+
         return;
     }
 
@@ -1086,8 +1118,13 @@ function stopCurrentSound() {
 
         currentSoundSource.stop();
 
-    } catch (error) {
-        // Already stopped.
+    } catch {
+
+        /*
+            The source may already have
+            finished naturally.
+        */
+
     }
 
 
@@ -1095,12 +1132,13 @@ function stopCurrentSound() {
 
         currentSoundSource.disconnect();
 
-    } catch (error) {
-        // Already disconnected.
+    } catch {
+
     }
 
 
-    currentSoundSource = null;
+    currentSoundSource =
+        null;
 }
 
 
@@ -1108,9 +1146,7 @@ function stopCurrentSound() {
    PLAY SOUND
 ========================================== */
 
-function playSound(
-    buffer
-) {
+function playSound(buffer) {
 
     if (
         !audioContext ||
@@ -1120,11 +1156,6 @@ function playSound(
         return;
     }
 
-
-    /*
-        If the browser suspended the
-        AudioContext, resume it.
-    */
 
     if (
         audioContext.state ===
@@ -1136,7 +1167,10 @@ function playSound(
 
 
     /*
-        Prevent overlapping sounds.
+        CRITICAL:
+
+        Stop whatever sound is currently
+        playing before starting this one.
     */
 
     stopCurrentSound();
@@ -1170,6 +1204,11 @@ function playSound(
 
     source.onended = () => {
 
+        /*
+            Only clear the variable if
+            this is still the active source.
+        */
+
         if (
             currentSoundSource ===
             source
@@ -1179,17 +1218,23 @@ function playSound(
                 null;
         }
 
+
         try {
 
             source.disconnect();
 
-        } catch (error) {}
+        } catch {
+
+        }
+
 
         try {
 
             gain.disconnect();
 
-        } catch (error) {}
+        } catch {
+
+        }
     };
 
 
@@ -1229,7 +1274,9 @@ function randomNumberWithDigits(
     digits
 ) {
 
-    if (digits === 1) {
+    if (
+        digits === 1
+    ) {
 
         return Math.floor(
             Math.random() * 10
@@ -1238,10 +1285,15 @@ function randomNumberWithDigits(
 
 
     const minimum =
-        10 ** (digits - 1);
+        10 ** (
+            digits - 1
+        );
+
 
     const maximum =
-        (10 ** digits) - 1;
+        (
+            10 ** digits
+        ) - 1;
 
 
     return Math.floor(
@@ -1266,15 +1318,21 @@ function generateQuestion() {
             level
         );
 
+
     currentB =
         randomNumberWithDigits(
             level
         );
 
-    currentAnswer =
-        currentA + currentB;
 
-    currentInput = "";
+    currentAnswer =
+        currentA +
+        currentB;
+
+
+    currentInput =
+        "";
+
 
     updateAnswerDisplay();
 
@@ -1282,11 +1340,14 @@ function generateQuestion() {
     const a =
         currentA.toLocaleString();
 
+
     const b =
         currentB.toLocaleString();
 
 
-    if (level >= 8) {
+    if (
+        level >= 8
+    ) {
 
         const operators = [
             "+",
@@ -1296,6 +1357,7 @@ function generateQuestion() {
             "+ +",
             "ADD"
         ];
+
 
         const operator =
             randomChoice(
@@ -1315,6 +1377,7 @@ function generateQuestion() {
 
     accepting = true;
 
+
     updateUI();
 }
 
@@ -1329,11 +1392,14 @@ function updateAnswerDisplay() {
         currentInput.length === 0
     ) {
 
-        answerDisplay.textContent = "";
+        answerDisplay.textContent =
+            "";
+
 
         answerDisplay.classList.add(
             "empty"
         );
+
 
         return;
     }
@@ -1359,6 +1425,7 @@ function addDigit(digit) {
 
     if (!started)
         return;
+
 
     if (!accepting)
         return;
@@ -1407,6 +1474,7 @@ function deleteDigit() {
     if (!started)
         return;
 
+
     if (!accepting)
         return;
 
@@ -1431,8 +1499,10 @@ function submitAnswer() {
     if (!started)
         return;
 
+
     if (!accepting)
         return;
+
 
     if (
         currentInput === ""
@@ -1480,39 +1550,35 @@ function handleCorrect() {
 
     accepting = false;
 
+
     correct++;
 
 
     /*
-        Correct.mp3 ONLY plays every
-        10th correct answer:
+        PLAY CORRECT SOUND
 
-        10
-        20
-        30
-        40
-        ...
+        If Wrong.mp3 happens to still be
+        playing, playSound() stops it first.
     */
 
-    if (
-        correct % 10 === 0
-    ) {
-
-        playCorrectSound();
-    }
+    playCorrectSound();
 
 
     questionNumber++;
 
 
-    if (level <= 3) {
+    if (
+        level <= 3
+    ) {
 
         showMessage(
             "✓",
             250
         );
 
-    } else if (level === 4) {
+    } else if (
+        level === 4
+    ) {
 
         showMessage(
             randomChoice([
@@ -1524,7 +1590,9 @@ function handleCorrect() {
             300
         );
 
-    } else if (level === 5) {
+    } else if (
+        level === 5
+    ) {
 
         showMessage(
             randomChoice([
@@ -1536,7 +1604,9 @@ function handleCorrect() {
             350
         );
 
-    } else if (level === 6) {
+    } else if (
+        level === 6
+    ) {
 
         showMessage(
             randomChoice([
@@ -1549,9 +1619,12 @@ function handleCorrect() {
             400
         );
 
+
         shakeScreen(150);
 
-    } else if (level === 7) {
+    } else if (
+        level === 7
+    ) {
 
         showMessage(
             randomChoice([
@@ -1565,9 +1638,12 @@ function handleCorrect() {
             450
         );
 
+
         shakeScreen(200);
 
-    } else if (level === 8) {
+    } else if (
+        level === 8
+    ) {
 
         showMessage(
             randomChoice([
@@ -1581,9 +1657,12 @@ function handleCorrect() {
             500
         );
 
+
         shakeScreen(250);
 
-    } else if (level === 9) {
+    } else if (
+        level === 9
+    ) {
 
         showMessage(
             randomChoice([
@@ -1595,6 +1674,7 @@ function handleCorrect() {
             ]),
             550
         );
+
 
         shakeScreen(350);
 
@@ -1612,6 +1692,7 @@ function handleCorrect() {
             ]),
             600
         );
+
 
         shakeScreen(500);
 
@@ -1637,12 +1718,15 @@ function handleWrong() {
 
     accepting = false;
 
+
     wrong++;
 
 
     /*
-        Wrong.mp3 plays EVERY time
-        the submitted answer is wrong.
+        PLAY WRONG SOUND
+
+        This automatically stops any
+        Correct.mp3 that is still playing.
     */
 
     playWrongSound();
@@ -1672,7 +1756,9 @@ function handleWrong() {
     );
 
 
-    if (level >= 4) {
+    if (
+        level >= 4
+    ) {
 
         shakeScreen(
             150 +
@@ -1681,7 +1767,9 @@ function handleWrong() {
     }
 
 
-    if (level >= 6) {
+    if (
+        level >= 6
+    ) {
 
         flashScreen();
     }
@@ -1693,11 +1781,15 @@ function handleWrong() {
     setTimeout(
         () => {
 
-            currentInput = "";
+            currentInput =
+                "";
+
 
             updateAnswerDisplay();
 
-            accepting = true;
+
+            accepting =
+                true;
 
         },
         350
@@ -1729,28 +1821,36 @@ function nextQuestion() {
 
         level++;
 
-        questionNumber = 0;
+
+        questionNumber =
+            0;
 
 
         document.body.className =
             `level${level}`;
 
 
-        if (level <= 3) {
+        if (
+            level <= 3
+        ) {
 
             showMessage(
                 `LEVEL ${level}`,
                 700
             );
 
-        } else if (level <= 6) {
+        } else if (
+            level <= 6
+        ) {
 
             showMessage(
                 `OH NO\nLEVEL ${level}`,
                 800
             );
 
-        } else if (level <= 9) {
+        } else if (
+            level <= 9
+        ) {
 
             showMessage(
                 `LEVEL ${level}\nWHY`,
@@ -1770,6 +1870,7 @@ function nextQuestion() {
             generateQuestion,
             900
         );
+
 
         return;
     }
@@ -1848,6 +1949,7 @@ function showMessage(
 
     messageElement.textContent =
         text;
+
 
     messageElement.classList.add(
         "show"
@@ -1987,6 +2089,7 @@ async function startGame() {
 
     started = true;
 
+
     level = 1;
 
     questionNumber = 0;
@@ -2001,9 +2104,9 @@ async function startGame() {
 
 
     /*
-        The BEGIN button is a real user
-        interaction, so initialize the
-        Web Audio context here.
+        BEGIN is a user interaction, so
+        this is the correct time to unlock
+        Web Audio on iOS.
     */
 
     initializeAudio();
@@ -2018,11 +2121,11 @@ async function startGame() {
 
 
     /*
-        Load both MP3 files from the
-        same folder as this HTML file.
+        Load both sounds.
 
-        The game waits for them before
-        accepting the first answer.
+        They are decoded into memory so
+        individual answers don't have to
+        fetch the MP3 repeatedly.
     */
 
     if (
@@ -2047,9 +2150,18 @@ function finishGame() {
     accepting = false;
 
 
+    /*
+        Stop any sound that may still be
+        playing when the game ends.
+    */
+
+    stopCurrentSound();
+
+
     document.getElementById(
         "app"
-    ).style.display = "none";
+    ).style.display =
+        "none";
 
 
     finishedScreen.style.display =
@@ -2057,7 +2169,8 @@ function finishGame() {
 
 
     const attempts =
-        correct + wrong;
+        correct +
+        wrong;
 
 
     const accuracy =
@@ -2107,8 +2220,10 @@ numberButtons.forEach(
 
                 event.preventDefault();
 
+
                 const digit =
                     button.dataset.number;
+
 
                 addDigit(digit);
             }
@@ -2127,6 +2242,7 @@ deleteButton.addEventListener(
 
         event.preventDefault();
 
+
         deleteDigit();
     }
 );
@@ -2141,6 +2257,7 @@ enterButton.addEventListener(
     event => {
 
         event.preventDefault();
+
 
         submitAnswer();
     }
@@ -2157,6 +2274,7 @@ startButton.addEventListener(
 
         event.preventDefault();
 
+
         startGame();
     }
 );
@@ -2171,6 +2289,7 @@ againButton.addEventListener(
     event => {
 
         event.preventDefault();
+
 
         location.reload();
     }
@@ -2235,7 +2354,6 @@ document.addEventListener(
     event => {
 
         event.preventDefault();
-
     }
 );
 
@@ -2244,7 +2362,6 @@ document.addEventListener(
     event => {
 
         event.preventDefault();
-
     }
 );
 
@@ -2253,7 +2370,6 @@ document.addEventListener(
     event => {
 
         event.preventDefault();
-
     }
 );
 
@@ -2270,16 +2386,17 @@ document.addEventListener(
 
 
         if (
-            now - lastTouchEnd <=
+            now -
+            lastTouchEnd <=
             300
         ) {
 
             event.preventDefault();
-
         }
 
 
-        lastTouchEnd = now;
+        lastTouchEnd =
+            now;
 
     },
     false
@@ -2314,6 +2431,7 @@ setInterval(
 
                 document.title =
                     "ADD. WHY.";
+
 
                 setTimeout(
                     () => {
